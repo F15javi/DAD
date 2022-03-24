@@ -10,7 +10,7 @@ public class DadVerticle3SenderBroadcast extends AbstractVerticle {
 	public void start(Promise<Void> startFuture) {
 		EventBus eventBus = getVertx().eventBus();
 		getVertx().setPeriodic(2000, _id -> {
-			eventBus.publish("mensaje-broadcast", "Soy Broadcast, ¿alguien me escucha?");
+			eventBus.publish("mensaje-broadcast", "Soy Broadcast, Â¿alguien me escucha?");
 		});
 	}
 

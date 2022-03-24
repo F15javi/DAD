@@ -107,10 +107,5 @@ public class Gps {
 	public String toString() {
 		return "Gps [Lat=" + Lat + ", Long=" + Long + ", dir=" + dir + ", vel=" + vel + ", alt=" + alt + "]";
 	}
-	
-	
-
-	
-	
 
 }
