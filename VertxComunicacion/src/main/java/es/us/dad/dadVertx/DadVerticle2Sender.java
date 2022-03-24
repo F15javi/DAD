@@ -1,9 +1,5 @@
 package es.us.dad.dadVertx;
 
-import java.util.Calendar;
-
-import com.google.gson.Gson;
-
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.eventbus.EventBus;
@@ -16,9 +12,7 @@ public class DadVerticle2Sender extends AbstractVerticle {
 	public void start(Promise<Void> startFuture) {
 		EventBus eventBus = getVertx().eventBus();
 		getVertx().setPeriodic(4000, _id -> {
-			Gps gps = new Gps(49.642462836423, 52.187236461741, 180, 402.2, 8000.5);
-			Gson gson = new Gson();
-			eventBus.request("mensaje-punto-a-punto", gson.toJson(gps), reply -> {
+			eventBus.request("mensaje-punto-a-punto", "Soy Local,¿alguien me escucha?", reply -> {
 				Message<Object> res = reply.result();
 				verticleID = res.address();
 				if (reply.succeeded()) {
@@ -28,6 +22,8 @@ public class DadVerticle2Sender extends AbstractVerticle {
 					System.out.println("No ha habido respuesta");
 				}
 			});
+			
+			eventBus.send("mensaje-punto-a-punto", "Esto es un mensaje sin respuesta");
 		});
 		
 		startFuture.complete();
