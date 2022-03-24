@@ -14,7 +14,7 @@ public class DadVerticle2ConsumerBroadcastGPS extends AbstractVerticle{
 			Gson gson = new Gson();
 			Gps jsonMessage = gson.fromJson(customMessage, Gps.class);
 			System.out.println("Mensaje recibido (" + message.address() + "): " + jsonMessage.toString());
-			String replyMessage = "Sí, yo te he escuchado al mensaje \"" + message.body().toString() + "\"";
+			String replyMessage = "SÃ­, yo te he escuchado al mensaje \"" + message.body().toString() + "\"";
 			message.reply(replyMessage);
 		});
 		startFuture.complete();
@@ -25,5 +25,5 @@ public class DadVerticle2ConsumerBroadcastGPS extends AbstractVerticle{
 		super.stop(stopFuture);
 	}
 
-
+ 
 }
