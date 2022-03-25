@@ -33,7 +33,7 @@ public class RestClientGPS extends AbstractVerticle {
 			}
 		});
 
-		restClientUtil.getRequest(443, "https://6238e3ff00ed1dbc5ab885fb.mockapi.io", "api/v1/gps", 
+		restClientUtil.getRequest(443, "https://623de8a6e8fbc4f1626944ab.mockapi.io", "api/v1/gps", 
 				Gps[].class, resList);
 
 		/* --------------- GET one request --------------- */
@@ -48,7 +48,7 @@ public class RestClientGPS extends AbstractVerticle {
 			}
 		});
 
-		restClientUtil.getRequest(443, "https://6238e3ff00ed1dbc5ab885fb.mockapi.io", "api/v1/gps/1", 
+		restClientUtil.getRequest(443, "https://623de8a6e8fbc4f1626944ab.mockapi.io", "api/v1/gps/1", 
 				Gps.class, res);
 
 		/* --------------- GET request con parámetros--------------- */
@@ -66,7 +66,7 @@ public class RestClientGPS extends AbstractVerticle {
 		params.put("id", "3");
 		params.put("otroparam", "123123");
 		params.put("otroparam2", "hola");
-		restClientUtil.getRequestWithParams(443, "https://6238e3ff00ed1dbc5ab885fb.mockapi.io", "api/v1/gps/1", 
+		restClientUtil.getRequestWithParams(443, "https://623de8a6e8fbc4f1626944ab.mockapi.io", "api/v1/gps/1", 
 				 Gps.class,
 				resWithParams, params);
 
@@ -84,7 +84,7 @@ public class RestClientGPS extends AbstractVerticle {
 
 		
 
-		restClientUtil.postRequest(443, "https://6238e3ff00ed1dbc5ab885fb.mockapi.io", "api/v1/gps",
+		restClientUtil.postRequest(443, "https://623de8a6e8fbc4f1626944ab.mockapi.io", "api/v1/gps",
 				new Gps(1, 42.551122, -20.145248, 120, 400.5, 8000.5),
 				Gps.class, resPost);
 		
@@ -102,7 +102,7 @@ public class RestClientGPS extends AbstractVerticle {
 
 		
 
-		restClientUtil.putRequest(443, "https://6238e3ff00ed1dbc5ab885fb.mockapi.io", "api/v1/gps/1",
+		restClientUtil.putRequest(443, "https://623de8a6e8fbc4f1626944ab.mockapi.io", "api/v1/gps/1",
 				new Gps(1, 42.551122, -20.145248, 120, 400.5, 7000.5),
 				Gps.class, resPut);
 
@@ -121,7 +121,7 @@ public class RestClientGPS extends AbstractVerticle {
 			System.out.println(fail.toString());
 		});
 
-		restClientUtil.deleteRequest(443, "https://6238e3ff00ed1dbc5ab885fb.mockapi.io", "api/v1/gps/3",
+		restClientUtil.deleteRequest(443, "https://623de8a6e8fbc4f1626944ab.mockapi.io", "api/v1/gps/3",
 				resDelete);
 		
 		

@@ -21,7 +21,6 @@ import io.vertx.ext.web.handler.BodyHandler;
 public class RestServerGPS extends AbstractVerticle {
 	
 	private Map<Integer, Gps> gps = new HashMap<Integer, Gps>();
-	//private Map<Integer, UserEntity> users = new HashMap<Integer, UserEntity>();
 	private Gson gson;
 
 	public void start(Promise<Void> startFuture) {
@@ -110,7 +109,7 @@ public class RestServerGPS extends AbstractVerticle {
 	}
 
 	private void putOne(RoutingContext routingContext) {
-		int id = Integer.parseInt(routingContext.request().getParam("userid"));
+		int id = Integer.parseInt(routingContext.request().getParam("id"));
 		Gps ds = gps.get(id);
 		final Gps element = gson.fromJson(routingContext.getBodyAsString(), Gps.class);
 		
