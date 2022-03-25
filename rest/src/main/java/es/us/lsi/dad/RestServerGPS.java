@@ -70,9 +70,9 @@ public class RestServerGPS extends AbstractVerticle {
 		routingContext.response().putHeader("content-type", "application/json; charset=utf-8").setStatusCode(200)
 				.end(gson.toJson(gps.values().stream().filter(elem -> {
 					boolean res = true;
-					res = res && lat != null ? elem.getLat().equals(lat) : true;
-					res = res && lon != null ? elem.getLong().equals(lon) : true;
-					res = res && dir != null ? elem.getDir().equals(dir.toString()) : true;
+					res = res && lat != null ? elem.getLat().equals(Double.parseDouble(lat)) : true;
+					res = res && lon != null ? elem.getLong().equals(Double.parseDouble(lon)) : true;
+					res = res && dir != null ? elem.getDir().equals(Integer.parseInt(dir)) : true;
 					return res;
 				}).collect(Collectors.toList())));
 	}
