@@ -19,6 +19,7 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 
 public class RestServerGPS extends AbstractVerticle {
+	
 	private Map<Integer, Gps> gps = new HashMap<Integer, Gps>();
 	//private Map<Integer, UserEntity> users = new HashMap<Integer, UserEntity>();
 	private Gson gson;
@@ -70,7 +71,7 @@ public class RestServerGPS extends AbstractVerticle {
 				.end(gson.toJson(gps.values().stream().filter(elem -> {
 					boolean res = true;
 					res = res && lat != null ? elem.getLat().equals(lat) : true;
-					res = res && surname != null ? elem.getLong().equals(lon) : true;
+					res = res && lon != null ? elem.getLong().equals(lon) : true;
 					res = res && dir != null ? elem.getDir().equals(dir.toString()) : true;
 					return res;
 				}).collect(Collectors.toList())));
@@ -79,7 +80,7 @@ public class RestServerGPS extends AbstractVerticle {
 	private void getOne(RoutingContext routingContext) {
 		int id = Integer.parseInt(routingContext.request().getParam("id"));
 		if (gps.containsKey(id)) {
-			Gps ds = gps.getid(id);
+			Gps ds = gps.get(id);
 			routingContext.response().putHeader("content-type", "application/json; charset=utf-8").setStatusCode(200)
 					.end(gson.toJson(ds));
 		} else {
@@ -89,19 +90,19 @@ public class RestServerGPS extends AbstractVerticle {
 	}
 
 	private void addOne(RoutingContext routingContext) {
-		final Gps user = gson.fromJson(routingContext.getBodyAsString(), Gps.class);
-		users.put(user.getIduser(), user);
+		final Gps gpss = gson.fromJson(routingContext.getBodyAsString(), Gps.class);
+		gps.put(gpss.getId(), gpss);
 		routingContext.response().setStatusCode(201).putHeader("content-type", "application/json; charset=utf-8")
-				.end(gson.toJson(user));
+				.end(gson.toJson(gpss));
 	}
 
 	private void deleteOne(RoutingContext routingContext) {
-		int id = Integer.parseInt(routingContext.request().getParam("userid"));
-		if (users.containsKey(id)) {
-			Gps user = users.get(id);
-			users.remove(id);
+		int id = Integer.parseInt(routingContext.request().getParam("id"));
+		if (gps.containsKey(id)) {
+			Gps gpss = gps.get(id);
+			gps.remove(id);
 			routingContext.response().setStatusCode(200).putHeader("content-type", "application/json; charset=utf-8")
-					.end(gson.toJson(user));
+					.end(gson.toJson(gpss));
 		} else {
 			routingContext.response().setStatusCode(204).putHeader("content-type", "application/json; charset=utf-8")
 					.end();
@@ -110,24 +111,25 @@ public class RestServerGPS extends AbstractVerticle {
 
 	private void putOne(RoutingContext routingContext) {
 		int id = Integer.parseInt(routingContext.request().getParam("userid"));
-		Gps ds = users.get(id);
+		Gps ds = gps.get(id);
 		final Gps element = gson.fromJson(routingContext.getBodyAsString(), Gps.class);
-		ds.setName(element.getName());
-		ds.setSurname(element.getSurname());
-		ds.setBirthdate(element.getBirthdate());
-		ds.setPassword(element.getPassword());
-		ds.setUsername(element.getUsername());
-		users.put(ds.getIduser(), ds);
+		
+		ds.setLat(element.getLat());
+		ds.setLong(element.getLong());
+		ds.setDir(element.getDir());
+		ds.setVel(element.getVel());
+		ds.setAlt(element.getAlt());
+		gps.put(ds.getId(), ds);
 		routingContext.response().setStatusCode(201).putHeader("content-type", "application/json; charset=utf-8")
 				.end(gson.toJson(element));
 	}
 
 	private void createSomeData(int number) {
 		Random rnd = new Random();
+		
 		IntStream.range(0, number).forEach(elem -> {
 			int id = rnd.nextInt();
-			users.put(id, new Gps(id, "Nombre_" + id, "Apellido_" + id,
-					Calendar.getInstance().getTimeInMillis() + id, "Username_" + id, "Password_" + id));
+			gps.put(id, new Gps(id, rnd.nextDouble(),  rnd.nextDouble(), rnd.nextInt(), rnd.nextDouble(), rnd.nextDouble()));
 		});
 	}
 
