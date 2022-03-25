@@ -3,15 +3,15 @@ package es.us.lsi.dad;
 import java.util.Objects;
 
 public class Gps {
-	private int id;
-	private double Lat;
-	private double Long;
-	private int dir;
-	private double vel;
-	private double alt;
+	private Integer id;
+	private Double Lat;
+	private Double Long;
+	private Integer dir;
+	private Double vel;
+	private Double alt;
 	
 
-	public Gps(int id, double lat, double lon, int dir, double vel, double alt) {
+	public Gps(Integer id, Double lat, Double lon, Integer dir, Double vel, Double alt) {
 		super();
 		this.id = id;
 		this.Lat = lat;
@@ -27,62 +27,62 @@ public class Gps {
 	}
 
 
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
 
-	public double getLat() {
+	public Double getLat() {
 		return Lat;
 	}
 
 
-	public void setLat(double lat) {
+	public void setLat(Double lat) {
 		Lat = lat;
 	}
 
 
-	public double getLong() {
+	public Double getLong() {
 		return Long;
 	}
 
 
-	public void setLong(double l) {
+	public void setLong(Double l) {
 		Long = l;
 	}
 
 
-	public int getDir() {
+	public Integer getDir() {
 		return dir;
 	}
 
 
-	public void setDir(int dir) {
+	public void setDir(Integer dir) {
 		this.dir = dir;
 	}
 
 
-	public double getVel() {
+	public Double getVel() {
 		return vel;
 	}
 
 
-	public void setVel(double vel) {
+	public void setVel(Double vel) {
 		this.vel = vel;
 	}
 
 
-	public double getAlt() {
+	public Double getAlt() {
 		return alt;
 	}
 
 
-	public void setAlt(double alt) {
+	public void setAlt(Double alt) {
 		this.alt = alt;
 	}
 
@@ -102,10 +102,8 @@ public class Gps {
 		if (getClass() != obj.getClass())
 			return false;
 		Gps other = (Gps) obj;
-		return Double.doubleToLongBits(Lat) == Double.doubleToLongBits(other.Lat)
-				&& Double.doubleToLongBits(Long) == Double.doubleToLongBits(other.Long)
-				&& Double.doubleToLongBits(alt) == Double.doubleToLongBits(other.alt) && dir == other.dir
-				&& id == other.id && Double.doubleToLongBits(vel) == Double.doubleToLongBits(other.vel);
+		return Objects.equals(Lat, other.Lat) && Objects.equals(Long, other.Long) && Objects.equals(alt, other.alt)
+				&& Objects.equals(dir, other.dir) && Objects.equals(id, other.id) && Objects.equals(vel, other.vel);
 	}
 
 
@@ -115,8 +113,4 @@ public class Gps {
 				+ "]";
 	}
 	
-
-
-	
-
 }
