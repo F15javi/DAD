@@ -10,6 +10,9 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.WebClient;
 
+
+
+
 public class RestClientUtil {
 	
 	public WebClient client;

@@ -7,7 +7,7 @@ public class DadVerticle0Publisher extends AbstractVerticle {
 
 	@Override
 	public void start(Promise<Void> startFuture) {
-		String name1 = DadVerticle2Consumer.class.getName();
+		String name1 = DadVerticle2ConsumerBroadcastGPS.class.getName();
 		getVertx().deployVerticle(name1, deployResult -> {
 			if (deployResult.succeeded()) {
 				System.out.println(name1 + " (" + deployResult.result() + ") ha sido desplegado correctamente");
@@ -16,7 +16,7 @@ public class DadVerticle0Publisher extends AbstractVerticle {
 			}
 		});
 		
-		String name2 = DadVerticle2Sender.class.getName();
+		String name2 = DadVerticle2SenderBroadcastGPS.class.getName();
 		getVertx().deployVerticle(name2, deployResult -> {
 			if (deployResult.succeeded()) {
 				System.out.println(name2 + " (" + deployResult.result() + ") ha sido desplegado correctamente");
@@ -28,8 +28,8 @@ public class DadVerticle0Publisher extends AbstractVerticle {
 
 	@Override
 	public void stop(Promise<Void> stopFuture) throws Exception {
-		getVertx().undeploy(DadVerticle2Consumer.class.getName());
-		getVertx().undeploy(DadVerticle2Sender.class.getName());
+		getVertx().undeploy(DadVerticle2ConsumerBroadcastGPS.class.getName());
+		getVertx().undeploy(DadVerticle2SenderBroadcastGPS.class.getName());
 		super.stop(stopFuture);
 	}
 }
