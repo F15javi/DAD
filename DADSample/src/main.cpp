@@ -5,10 +5,10 @@
 int test_delay = 1000; //so we don't spam the API
 boolean describe_tests = true;
 
-RestClient client = RestClient("192.168.123.104", 80);
+RestClient client = RestClient("192.168.123.104", 80);//IP del servidor
 
-#define STASSID "Luismi21Ultra"
-#define STAPSK  "tdpo8180"
+#define STASSID "Luismi21Ultra"//Usuario
+#define STAPSK  "tdpo8180"//Contraseña
 
 //Setup
 void setup()
@@ -38,7 +38,7 @@ void setup()
 
 String response;
 
-String serializeBody(int idSensor, String sensor, long time, double lat, double lon)
+String serializeBody(int idSensor, String sensor, long time, double lat, double lon) // cambiar para nuestro gps
 {
   StaticJsonDocument<200> doc;
 
@@ -49,13 +49,13 @@ String serializeBody(int idSensor, String sensor, long time, double lat, double 
 
   // Add values in the document
   //
-  doc["sensor"] = sensor;
+  doc["sensor"] = sensor;//modificar esto tambien
   doc["idSensor"] = idSensor;
   doc["time"] = time;
 
   // Add an array.
   //
-  JsonArray data = doc.createNestedArray("data");
+  JsonArray data = doc.createNestedArray("data");//sobra!!!
   data.add(lat);
   data.add(lon);
 
@@ -124,7 +124,7 @@ void deserializeBody(String responseJson){
     //
     // Most of the time, you can rely on the implicit casts.
     // In other case, you can do doc["time"].as<long>();
-    const char *sensor = doc["sensor"];
+    const char *sensor = doc["sensor"];//cambiar esto!!!
     long time = doc["time"];
     double latitude = doc["data"][0];
     double longitude = doc["data"][1];
