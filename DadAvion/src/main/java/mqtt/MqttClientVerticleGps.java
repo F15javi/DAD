@@ -3,13 +3,13 @@ package mqtt;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+import clases.Gps;
 import io.netty.handler.codec.mqtt.MqttQoS;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.mqtt.MqttClient;
 import io.vertx.mqtt.MqttClientOptions;
-
 
 public class MqttClientVerticleGps extends AbstractVerticle{
 	Gson gson;

@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 
+import clases.Gps;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -42,14 +43,14 @@ public class MainVerticleGps extends AbstractVerticle{
 	}
 	
 	private void getAll() {
-		mySqlClient.query("SELECT * FROM dad_db_avion.gps;", res -> {
+		mySqlClient.query("SELECT * FROM dad_db_avion.gps;").execute(res -> {
 			if (res.succeeded()) {
 				// Get the result set
 				RowSet<Row> resultSet = res.result();
 				System.out.println(resultSet.size());
 				JsonArray result = new JsonArray();
 				for (Row elem : resultSet) {
-					result.add(JsonObject.mapFrom(new GpsImpl(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
+					result.add(JsonObject.mapFrom(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
 							elem.getDouble("lat"), elem.getDouble("lon"),
 							elem.getInteger("dir"), elem.getDouble("vel"), elem.getDouble("alt"), elem.getLong("hor"))));
 				}
@@ -63,7 +64,7 @@ public class MainVerticleGps extends AbstractVerticle{
 	private void getAllWithConnection() {
 		mySqlClient.getConnection(connection -> {
 			if (connection.succeeded()) {
-				connection.result().query("SELECT * FROM dad_db_avion.gps;", res -> {
+				connection.result().query("SELECT * FROM dad_db_avion.gps;").execute( res -> {
 					if (res.succeeded()) {
 						// Get the result set
 						RowSet<Row> resultSet = res.result();
@@ -71,7 +72,7 @@ public class MainVerticleGps extends AbstractVerticle{
 						JsonArray result = new JsonArray();
 						for (Row elem : resultSet) {
 							result.add(JsonObject
-									.mapFrom(new GpsImpl(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
+									.mapFrom(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
 											elem.getDouble("lat"), elem.getDouble("lon"),
 											elem.getInteger("dir"), elem.getDouble("vel"), elem.getDouble("alt"), elem.getLong("hor"))));
 						}
@@ -90,7 +91,7 @@ public class MainVerticleGps extends AbstractVerticle{
 	private void getById_Gps(String id_Gps) {
 		mySqlClient.getConnection(connection -> {
 			if (connection.succeeded()) {
-				connection.result().preparedQuery("SELECT * FROM dad_db_avion.gps WHERE id_Gps = ?",
+				connection.result().preparedQuery("SELECT * FROM dad_db_avion.gps WHERE id_Gps = ?").execute(
 						Tuple.of(id_Gps), res -> {
 							if (res.succeeded()) {
 								// Get the result set
@@ -98,7 +99,7 @@ public class MainVerticleGps extends AbstractVerticle{
 								System.out.println(resultSet.size());
 								JsonArray result = new JsonArray();
 								for (Row elem : resultSet) {
-									result.add(JsonObject.mapFrom(new GpsImpl(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
+									result.add(JsonObject.mapFrom(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
 											elem.getDouble("lat"), elem.getDouble("lon"), elem.getInteger("dir"), elem.getDouble("vel"), 
 											elem.getDouble("alt"), elem.getLong("hor"))));
 								}
@@ -115,7 +116,7 @@ public class MainVerticleGps extends AbstractVerticle{
 	}
 	
 	@Override
-	public void stop(Future<Void> stopFuture) throws Exception {
+	public void stop(Promise<Void> stopFuture) throws Exception {
 		super.stop(stopFuture);
 	}
 

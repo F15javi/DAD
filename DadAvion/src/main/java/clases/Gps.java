@@ -1,8 +1,8 @@
-package mysql;
+package clases;
 
 import java.util.Objects;
 
-public class GpsImpl {
+public class Gps {
 	private Integer id_Gps;
 	private Integer id_Fly;
 	private Double lat;
@@ -12,7 +12,7 @@ public class GpsImpl {
 	private Double alt;
 	private Long hor;
 	
-	public GpsImpl(Integer id_Gps, Integer id_Fly, Double lat, Double lon, Integer dir, Double vel, Double alt, Long hor) {
+	public Gps(Integer id_Gps, Integer id_Fly, Double lat, Double lon, Integer dir, Double vel, Double alt, Long hor) {
 		super();
 		this.id_Gps = id_Gps;
 		this.id_Fly = id_Fly;
@@ -24,7 +24,7 @@ public class GpsImpl {
 		this.hor = hor;
 	}
 	
-	public GpsImpl() {
+	public Gps() {
 		super();
 	}
 
@@ -106,7 +106,7 @@ public class GpsImpl {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		GpsImpl other = (GpsImpl) obj;
+		Gps other = (Gps) obj;
 		return Objects.equals(alt, other.alt) && Objects.equals(dir, other.dir) && Objects.equals(hor, other.hor)
 				&& Objects.equals(id_Fly, other.id_Fly) && Objects.equals(id_Gps, other.id_Gps)
 				&& Objects.equals(lat, other.lat) && Objects.equals(lon, other.lon) && Objects.equals(vel, other.vel);
