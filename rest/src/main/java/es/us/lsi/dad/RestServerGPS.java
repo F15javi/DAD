@@ -130,6 +130,7 @@ public class RestServerGPS extends AbstractVerticle {
 			int id = rnd.nextInt();
 			gps.put(id, new Gps(id, rnd.nextDouble(),  rnd.nextDouble(), rnd.nextInt(), rnd.nextDouble(), rnd.nextDouble()));
 		});
+	System.out.println(gps);
 	}
 
 }
