@@ -10,9 +10,9 @@ public class Gps {
 	private Integer dir;
 	private Double vel;
 	private Double alt;
-	private Long hor;
+	private Long time;
 	
-	public Gps(Integer id_Gps, Integer id_Fly, Double lat, Double lon, Integer dir, Double vel, Double alt, Long hor) {
+	public Gps(Integer id_Gps, Integer id_Fly, Double lat, Double lon, Integer dir, Double vel, Double alt, Long time) {
 		super();
 		this.id_Gps = id_Gps;
 		this.id_Fly = id_Fly;
@@ -21,7 +21,7 @@ public class Gps {
 		this.dir = dir;
 		this.vel = vel;
 		this.alt = alt;
-		this.hor = hor;
+		this.time = time;
 	}
 	
 	public Gps() {
@@ -85,17 +85,17 @@ public class Gps {
 		this.alt = alt;
 	}
 
-	public Long getHor() {
-		return hor;
+	public Long getTime() {
+		return time;
 	}
 
-	public void setHor(Long hor) {
-		this.hor = hor;
+	public void setTime(Long time) {
+		this.time = time;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(alt, dir, hor, id_Fly, id_Gps, lat, lon, vel);
+		return Objects.hash(alt, dir, time, id_Fly, id_Gps, lat, lon, vel);
 	}
 
 	@Override
@@ -107,7 +107,7 @@ public class Gps {
 		if (getClass() != obj.getClass())
 			return false;
 		Gps other = (Gps) obj;
-		return Objects.equals(alt, other.alt) && Objects.equals(dir, other.dir) && Objects.equals(hor, other.hor)
+		return Objects.equals(alt, other.alt) && Objects.equals(dir, other.dir) && Objects.equals(time, other.time)
 				&& Objects.equals(id_Fly, other.id_Fly) && Objects.equals(id_Gps, other.id_Gps)
 				&& Objects.equals(lat, other.lat) && Objects.equals(lon, other.lon) && Objects.equals(vel, other.vel);
 	}
@@ -115,7 +115,7 @@ public class Gps {
 	@Override
 	public String toString() {
 		return "Gps [id_Gps=" + id_Gps + ", id_Fly=" + id_Fly + ", lat=" + lat + ", lon=" + lon + ", dir=" + dir
-				+ ", vel=" + vel + ", alt=" + alt + ", hor=" + hor + "]";
+				+ ", vel=" + vel + ", alt=" + alt + ", time=" + time + "]";
 	}
 	
 	
