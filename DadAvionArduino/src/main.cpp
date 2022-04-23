@@ -7,8 +7,8 @@ boolean describe_tests = true;
 
 RestClient client = RestClient("192.168.1.102", 80);//IP del servidor
 
-#define STASSID "DADLinksys"//Usuario
-#define STAPSK  "dad202122"//Contraseña
+#define STASSID "MiFibra-E482-24G"//Usuario
+#define STAPSK  "Ng9ggSvK"//Contraseña
 
 //Setup
 void setup()
@@ -126,16 +126,31 @@ void deserializeBody(String responseJson){
     //
     // Most of the time, you can rely on the implicit casts.
     // In other case, you can do doc["time"].as<long>();
-    const char *sensor = doc["sensor"];//cambiar esto!!!
-    long time = doc["time"];
-    double latitude = doc["data"][0];
-    double longitude = doc["data"][1];
+
+
+    int id_Gps = doc["id_Gps"];
+    int id_Fly = doc["id_Fly"];
+    double lat = doc["lat"];
+    double lon = doc["lon"];
+    int dir = doc["dir"];
+    double vel = doc["vel"];
+    double alt = doc["alt"]; 
+    long time = doc["time"];   
+
+
+
+  
 
     // Print values.
-    Serial.println(sensor);
+    Serial.println(id_Gps);
+    Serial.println(id_Fly);
+    Serial.println(lat);
+    Serial.println(lon);
+    Serial.println(dir);
+    Serial.println(vel);
+    Serial.println(alt);
     Serial.println(time);
-    Serial.println(latitude, 6);
-    Serial.println(longitude, 6);
+
   }
 }
 
@@ -154,35 +169,54 @@ void describe(char *description)
 void GET_tests()
 {
   describe("Test GET with path");
-  test_status(client.get("/api/sensors", &response));
+  test_status(client.get("/api/gps", &response));
   test_response();
 
   describe("Test GET with path and response");
-  test_status(client.get("/api/sensors", &response));
+  test_status(client.get("/api/gps", &response));
   test_response();
 
   describe("Test GET with path");
-  test_status(client.get("/api/sensors/123", &response));
+  test_status(client.get("/api/gps/123", &response));
   test_response();
 }
 
 void POST_tests()
 {
-  String post_body = serializeBody(millis(), "gps", millis(), random(200, 400)/10, random(-150, -30)/10);
+  String post_body = serializeBody(random(1,200),
+                                  random(1,200),
+                                  random(-900,900)/10.0, 
+                                  random(-1800, 1800)/10.0, 
+                                  random(0,359),
+                                  random(1,20000)/10.0,
+                                  random(0,200000)/10,
+                                  random(141241154122,251241254122)//random esta loco
+                                  ); 
   describe("Test POST with path and body and response");
-  test_status(client.post("/api/sensors", post_body.c_str(), &response));
+  test_status(client.post("/api/gps", post_body.c_str(), &response));
   test_response();
 }
 
 void PUT_tests()
 {
-  int temp = 38;
+  int id_Fly = 2;
   long timestamp = 151241254122;
+
+  double lat = 154.8680115;
+  double lon = 79.86796334;
+  int dir = 277;
+  double vel = 1988.41;
+  double alt = 3436.48;
+
+
   // POST TESTS
-  String post_body = "{ 'idsensor' : 18, 'value': " + temp;
-  post_body = post_body + " , 'timestamp' :";
-  post_body = post_body + timestamp;
-  post_body = post_body + ", 'user' : 'Luismi'}";
+  String post_body = "{ 'id_Gps' : 1, 'id_Fly': " + id_Fly;
+  post_body = post_body + " , 'lat' :" + timestamp;
+  post_body = post_body + " , 'lon' :" + timestamp;
+  post_body = post_body + " , 'dir' :" + timestamp;
+  post_body = post_body + " , 'vel' :" + timestamp;
+  post_body = post_body + " , 'alt' :" + timestamp;
+  post_body = post_body + ", 'timestamp' : '151241254122'}";
 
   describe("Test PUT with path and body");
   test_status(client.put("/data/445654", post_body.c_str()));
@@ -209,13 +243,22 @@ void PUT_tests()
 
 void DELETE_tests()
 {
-  int temp = 37;
-  long timestamp = 151241254122;
+  int id_Fly = 2;
+  //long timestamp = 151241254122;
+
+  double lat = 154.8680115;
+  double lon = 79.86796334;
+  int dir = 277;
+  double vel = 1988.41;
+  double alt = 3436.48;
   // POST TESTS
-  String post_body = "{ 'idsensor' : 18, 'value': " + temp;
-  post_body = post_body + " , 'timestamp' :";
-  post_body = post_body + timestamp;
-  post_body = post_body + ", 'user' : 'Luismi'}";
+  String post_body = "{ 'id_Gps' : 1, 'id_Fly': " + id_Fly;
+  post_body = post_body + " , 'lat' :" + lat;
+  post_body = post_body + " , 'lon' :" + lon;
+  post_body = post_body + " , 'dir' :" + dir;
+  post_body = post_body + " , 'vel' :" + vel;
+  post_body = post_body + " , 'alt' :" + alt;
+  post_body = post_body + ", 'timestamp' : '151241254122'}";
 
   describe("Test DELETE with path");
   //note: requires a special endpoint
