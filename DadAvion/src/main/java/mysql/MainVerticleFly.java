@@ -1,8 +1,7 @@
 package mysql;
 
+import clases.Fly;
 import io.vertx.core.AbstractVerticle;
-
-import clases.Gps;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -13,10 +12,10 @@ import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
 import io.vertx.sqlclient.Tuple;
 
-public class MainVerticleGps extends AbstractVerticle{
-
+public class MainVerticleFly extends AbstractVerticle{
+	
 	MySQLPool mySqlClient;
-
+	
 	@Override
 	public void start(Promise<Void> startFuture) {
 		MySQLConnectOptions connectOptions = new MySQLConnectOptions().setPort(3306).setHost("localhost")
@@ -32,22 +31,21 @@ public class MainVerticleGps extends AbstractVerticle{
 
 		
 		for (int i = 0; i < 100; i++) {
-			getById_Gps("1");	
+			getById_Fly("1");	
 		}
 
 	}
 	
 	private void getAll() {
-		mySqlClient.query("SELECT * FROM dad_db_avion.gps;").execute(res -> {
+		mySqlClient.query("SELECT * FROM dad_db_avion.fly;").execute(res -> {
 			if (res.succeeded()) {
 				// Get the result set
 				RowSet<Row> resultSet = res.result();
 				System.out.println(resultSet.size());
 				JsonArray result = new JsonArray();
 				for (Row elem : resultSet) {
-					result.add(JsonObject.mapFrom(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
-							elem.getDouble("lat"), elem.getDouble("lon"),
-							elem.getInteger("dir"), elem.getDouble("vel"), elem.getDouble("alt"), elem.getLong("time"))));
+					result.add(JsonObject.mapFrom(new Fly(elem.getInteger("id_Fly"), elem.getInteger("id_AirporDest"), 
+							elem.getInteger("id_AirporOrig"), elem.getString("plate"),  elem.getLong("time_Dep"), elem.getLong("time_Arr"))));
 				}
 				System.out.println(result.toString());
 			} else {
@@ -59,7 +57,7 @@ public class MainVerticleGps extends AbstractVerticle{
 	private void getAllWithConnection() {
 		mySqlClient.getConnection(connection -> {
 			if (connection.succeeded()) {
-				connection.result().query("SELECT * FROM dad_db_avion.gps;").execute( res -> {
+				connection.result().query("SELECT * FROM dad_db_avion.fly;").execute( res -> {
 					if (res.succeeded()) {
 						// Get the result set
 						RowSet<Row> resultSet = res.result();
@@ -67,9 +65,8 @@ public class MainVerticleGps extends AbstractVerticle{
 						JsonArray result = new JsonArray();
 						for (Row elem : resultSet) {
 							result.add(JsonObject
-									.mapFrom(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
-											elem.getDouble("lat"), elem.getDouble("lon"),
-											elem.getInteger("dir"), elem.getDouble("vel"), elem.getDouble("alt"), elem.getLong("time"))));
+									.mapFrom(new Fly(elem.getInteger("id_Fly"), elem.getInteger("id_AirporDest"), 
+											elem.getInteger("id_AirporOrig"), elem.getString("plate"),  elem.getLong("time_Dep"), elem.getLong("time_Arr"))));
 						}
 						System.out.println(result.toString());
 					} else {
@@ -83,20 +80,19 @@ public class MainVerticleGps extends AbstractVerticle{
 		});
 	}
 	
-	private void getById_Gps(String id_Gps) {
+	private void getById_Fly(String id_Fly) {
 		mySqlClient.getConnection(connection -> {
 			if (connection.succeeded()) {
-				connection.result().preparedQuery("SELECT * FROM dad_db_avion.gps WHERE id_Gps = ?").execute(
-						Tuple.of(id_Gps), res -> {
+				connection.result().preparedQuery("SELECT * FROM dad_db_avion.fly WHERE id_Fly = ?").execute(
+						Tuple.of(id_Fly), res -> {
 							if (res.succeeded()) {
 								// Get the result set
 								RowSet<Row> resultSet = res.result();
 								System.out.println(resultSet.size());
 								JsonArray result = new JsonArray();
 								for (Row elem : resultSet) {
-									result.add(JsonObject.mapFrom(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
-											elem.getDouble("lat"), elem.getDouble("lon"), elem.getInteger("dir"), elem.getDouble("vel"), 
-											elem.getDouble("alt"), elem.getLong("time"))));
+									result.add(JsonObject.mapFrom(new Fly(elem.getInteger("id_Fly"), elem.getInteger("id_AirporDest"), 
+											elem.getInteger("id_AirporOrig"), elem.getString("plate"),  elem.getLong("time_Dep"), elem.getLong("time_Arr"))));
 								}
 								System.out.println(result.toString());
 							} else {
@@ -109,11 +105,8 @@ public class MainVerticleGps extends AbstractVerticle{
 			}
 		});
 	}
-	
 	@Override
 	public void stop(Promise<Void> stopFuture) throws Exception {
 		super.stop(stopFuture);
 	}
-
-	
 }
