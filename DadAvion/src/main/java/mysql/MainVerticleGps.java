@@ -47,7 +47,7 @@ public class MainVerticleGps extends AbstractVerticle{
 				for (Row elem : resultSet) {
 					result.add(JsonObject.mapFrom(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
 							elem.getDouble("lat"), elem.getDouble("lon"),
-							elem.getInteger("dir"), elem.getDouble("vel"), elem.getDouble("alt"), elem.getLong("hor"))));
+							elem.getInteger("dir"), elem.getDouble("vel"), elem.getDouble("alt"), elem.getLong("time"))));
 				}
 				System.out.println(result.toString());
 			} else {
@@ -69,7 +69,7 @@ public class MainVerticleGps extends AbstractVerticle{
 							result.add(JsonObject
 									.mapFrom(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
 											elem.getDouble("lat"), elem.getDouble("lon"),
-											elem.getInteger("dir"), elem.getDouble("vel"), elem.getDouble("alt"), elem.getLong("hor"))));
+											elem.getInteger("dir"), elem.getDouble("vel"), elem.getDouble("alt"), elem.getLong("time"))));
 						}
 						System.out.println(result.toString());
 					} else {
@@ -96,7 +96,7 @@ public class MainVerticleGps extends AbstractVerticle{
 								for (Row elem : resultSet) {
 									result.add(JsonObject.mapFrom(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
 											elem.getDouble("lat"), elem.getDouble("lon"), elem.getInteger("dir"), elem.getDouble("vel"), 
-											elem.getDouble("alt"), elem.getLong("hor"))));
+											elem.getDouble("alt"), elem.getLong("time"))));
 								}
 								System.out.println(result.toString());
 							} else {
