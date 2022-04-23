@@ -1,8 +1,13 @@
 package mysql;
 
 import io.vertx.core.AbstractVerticle;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 
 import clases.Gps;
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -47,7 +52,7 @@ public class MainVerticleGps extends AbstractVerticle{
 				for (Row elem : resultSet) {
 					result.add(JsonObject.mapFrom(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
 							elem.getDouble("lat"), elem.getDouble("lon"),
-							elem.getInteger("dir"), elem.getDouble("vel"), elem.getDouble("alt"), elem.getLong("time"))));
+							elem.getInteger("dir"), elem.getDouble("vel"), elem.getDouble("alt"), elem.getLong("hor"))));
 				}
 				System.out.println(result.toString());
 			} else {
@@ -69,7 +74,7 @@ public class MainVerticleGps extends AbstractVerticle{
 							result.add(JsonObject
 									.mapFrom(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
 											elem.getDouble("lat"), elem.getDouble("lon"),
-											elem.getInteger("dir"), elem.getDouble("vel"), elem.getDouble("alt"), elem.getLong("time"))));
+											elem.getInteger("dir"), elem.getDouble("vel"), elem.getDouble("alt"), elem.getLong("hor"))));
 						}
 						System.out.println(result.toString());
 					} else {
@@ -96,7 +101,7 @@ public class MainVerticleGps extends AbstractVerticle{
 								for (Row elem : resultSet) {
 									result.add(JsonObject.mapFrom(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
 											elem.getDouble("lat"), elem.getDouble("lon"), elem.getInteger("dir"), elem.getDouble("vel"), 
-											elem.getDouble("alt"), elem.getLong("time"))));
+											elem.getDouble("alt"), elem.getLong("hor"))));
 								}
 								System.out.println(result.toString());
 							} else {
