@@ -1,13 +1,8 @@
 package mysql;
 
 import io.vertx.core.AbstractVerticle;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
 
 import clases.Gps;
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
