@@ -21,6 +21,12 @@ public class Fly {
 	}
 	public Fly() {
 		super();
+		this.id_Fly = 0;
+		this.id_AirportDest = 0;
+		this.id_AirportOrig = 0;
+		this.plate = "";
+		this.time_Dep = 0L;
+		this.time_Arr = 0L;
 	}
 	
 	public Integer getId_Fly() {

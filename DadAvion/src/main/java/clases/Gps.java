@@ -26,6 +26,15 @@ public class Gps {
 	
 	public Gps() {
 		super();
+		this.id_Gps = 0;
+		this.id_Fly = 0;
+		this.lat = 00.0;
+		this.lon = 00.0;
+		this.dir = 0;
+		this.vel = 0.0;
+		this.alt = 0.0;
+		this.time = 0L;
+		
 	}
 
 	

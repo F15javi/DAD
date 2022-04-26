@@ -5,10 +5,10 @@
 int test_delay = 1000; //so we don't spam the API
 boolean describe_tests = true;
 
-RestClient client = RestClient("192.168.1.102", 80);//IP del servidor
+RestClient client = RestClient("192.168.43.253", 80);//IP del servidor
 
-#define STASSID "MiFibra-E482-24G"//Usuario
-#define STAPSK  "Ng9ggSvK"//Contraseña
+#define STASSID "le wifi"//Usuario
+#define STAPSK  "Javier15"//Contraseña
 
 //Setup
 void setup()
@@ -183,7 +183,7 @@ void GET_tests()
 
 void POST_tests()
 {
-  String post_body = serializeBody(random(1,200),
+  String post_body = serializeBody(random(1,30),
                                   random(1,200),
                                   random(-900,900)/10.0, 
                                   random(-1800, 1800)/10.0, 

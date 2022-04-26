@@ -19,6 +19,10 @@ public class Airport {
 	
 	public Airport() {
 		super();
+		this.id_Airport = 0;
+		this.name = "";
+		this.lat = 00.0;
+		this.lon = 00.0;
 	}
 
 	public Integer getId_Airport() {

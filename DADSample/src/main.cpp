@@ -5,10 +5,10 @@
 int test_delay = 1000; //so we don't spam the API
 boolean describe_tests = true;
 
-RestClient client = RestClient("192.168.1.102", 80);//IP del servidor
+RestClient client = RestClient("192.168.43.253", 80);//IP del servidor
 
-#define STASSID "DADLinksys"//Usuario
-#define STAPSK  "dad202122"//Contraseña
+#define STASSID "le wifi"//Usuario
+#define STAPSK  "Javier15"//Contraseña
 
 //Setup
 void setup()
