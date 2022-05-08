@@ -1,6 +1,9 @@
 #include "RestClient.h"
 #include "ArduinoJson.h"
 #include <ESP8266WiFi.h>
+#include "TinyGPS++.h"
+
+TinyGPSPlus gps;
 
 int test_delay = 1000; //so we don't spam the API
 boolean describe_tests = true;
