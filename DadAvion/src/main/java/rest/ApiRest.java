@@ -19,7 +19,6 @@ import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
 import io.vertx.sqlclient.Tuple;
 import clases.Gps;
-import clases.Usuario;
 import clases.Fly;
 
 import com.google.gson.Gson;
@@ -60,6 +59,10 @@ public class ApiRest extends AbstractVerticle{
 		router.get("/api/gps").handler(this::getAllWithConnectionGPS);
 		router.get("/api/gps/:id").handler(this::getById_Gps);
 		router.post("/api/gps").handler(this::postGps);
+		
+		
+		router.route("api/fly*").handler(BodyHandler.create());
+		router.get("/api/fly").handler(this::getAllWithConnectionFLY);
 	
 		
 		
@@ -146,6 +149,34 @@ public class ApiRest extends AbstractVerticle{
 		});
 	}
 	
+	
+	private void getAllWithConnectionFLY(RoutingContext routingContext) {
+		mySqlClient.getConnection(connection -> {
+			if (connection.succeeded()) {
+				connection.result().query("SELECT * FROM dad_db_avion.fly;").execute( res -> {
+					if (res.succeeded()) {
+						// Get the result set
+						RowSet<Row> resultSet = res.result();
+						System.out.println(resultSet.size());
+						JsonArray result = new JsonArray();
+						for (Row elem : resultSet) {
+							result.add(JsonObject
+									.mapFrom(new Fly(elem.getInteger("id_Fly"), elem.getInteger("id_AirporDest"), 
+											elem.getInteger("id_AirporOrig"), elem.getString("plate"),  elem.getLong("time_Dep"), elem.getLong("time_Arr"))));
+						}
+						System.out.println(result.toString());
+					} else {
+						System.out.println("Error: " + res.cause().getLocalizedMessage());
+					}
+					connection.result().close();
+				});
+			} else {
+				System.out.println(connection.cause().toString());
+			}
+		});
+	}
+	
+	
 	private void getById_Gps(RoutingContext routingContext) {
 		Integer id_Gps = Integer.parseInt(routingContext.request().getParam("id_Gps"));
 		mySqlClient.getConnection(connection -> {
@@ -174,6 +205,10 @@ public class ApiRest extends AbstractVerticle{
 		});
 	}
 	
+	
+	
+	
+	
 	private void postGps(RoutingContext routingContext){
 		final Gps gps = gson.fromJson(routingContext.getBodyAsString(), Gps.class);	
 		mySqlClient.preparedQuery("INSERT INTO dad_db_avion.gps (id_Gps, id_Fly, lat, lon, dir, vel, alt, time) VALUES (?,?,?,?,?,?,?,?)", 	// no se que poner para que nos haga el post.
@@ -188,7 +223,39 @@ public class ApiRest extends AbstractVerticle{
 					System.out.println("Error"+handler.cause().getLocalizedMessage());
 				}
 			});
+	}
 		
+		
+		private void postFly(RoutingContext routingContext){
+			final Fly fly = gson.fromJson(routingContext.getBodyAsString(), Fly.class);	
+			mySqlClient.preparedQuery("INSERT INTO dad_db_avion.fly (id_Fly, id_AirportDest, id_AirportOrig, plate, time_Dep, time_Arr) VALUES (?,?,?,?,?,?)", 	// no se que poner para que nos haga el post.
+					Tuple.of(fly.getId_Fly(), fly.getId_AirportDest(), fly.getId_AirportOrig(), fly.getPlate(), fly.getTime_Dep(), fly.getTime_Arr()),handler -> {	
+					if (handler.succeeded()) {
+						routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
+						.end("Vuelo registrado");
+						System.out.println(JsonObject.mapFrom(usuario).encodePrettily()+"\n Vuelo registrado");
+					}else {
+						routingContext.response().setStatusCode(401).putHeader("content-type", "application/json")
+						.end((JsonObject.mapFrom(handler.cause()).encodePrettily()));
+						System.out.println("Error"+handler.cause().getLocalizedMessage());
+					}
+				});
+	}
+		
+		private void postAirport(RoutingContext routingContext){
+			final Airport airport = gson.fromJson(routingContext.getBodyAsString(), Airport.class);	
+			mySqlClient.preparedQuery("INSERT INTO dad_db_avion.airport (id_Airport, name, lat, lon) VALUES (?,?,?,?)", 	// no se que poner para que nos haga el post.
+					Tuple.of(airport.getId_Airport(), airport.getName(), airport.getLat(), airport.getLon()),handler -> {	
+					if (handler.succeeded()) {
+						routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
+						.end("Aeropuerto registrado");
+						System.out.println(JsonObject.mapFrom(usuario).encodePrettily()+"\n Aeropuerto registrado");
+					}else {
+						routingContext.response().setStatusCode(401).putHeader("content-type", "application/json")
+						.end((JsonObject.mapFrom(handler.cause()).encodePrettily()));
+						System.out.println("Error"+handler.cause().getLocalizedMessage());
+					}
+				});
 	}
 	
 	
