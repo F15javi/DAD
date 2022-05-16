@@ -292,12 +292,13 @@ public class ApiRest extends AbstractVerticle{
 	
 	private void postGps(RoutingContext routingContext){
 		final Gps gps = gson.fromJson(routingContext.getBodyAsString(), Gps.class);	
-		mySqlClient.preparedQuery("INSERT INTO dad_db_avion.gps (id_Gps, id_Fly, lat, lon, dir, vel, alt, time) VALUES (?,?,?,?,?,?,?,?)", 	// no se que poner para que nos haga el post.
-				Tuple.of(gps.getId_Gps(), gps.getId_Fly(), gps.getLat(), gps.getLon(), gps.getDir(), gps.getVel(), gps.getAlt(), gps.getTime()),handler -> {	
+		mySqlClient.preparedQuery("INSERT INTO dad_db_avion.gps (id_Gps, id_Fly, lat, lon, dir, vel, alt, time) VALUES (?,?,?,?,?,?,?,?)")
+				.execute(Tuple.of(gps.getId_Gps(), gps.getId_Fly(), gps.getLat(), gps.getLon(), gps.getDir(), gps.getVel(), gps.getAlt(), gps.getTime()) 	
+				,handler -> {	
 				if (handler.succeeded()) {
 					routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
 					.end("Gps registrado");
-					System.out.println(JsonObject.mapFrom(usuario).encodePrettily()+"\n Gps registrado");
+					System.out.println(JsonObject.mapFrom(gps).encodePrettily()+"\n Gps registrado");
 				}else {
 					routingContext.response().setStatusCode(401).putHeader("content-type", "application/json")
 					.end((JsonObject.mapFrom(handler.cause()).encodePrettily()));
