@@ -64,12 +64,10 @@ public class ApiRest extends AbstractVerticle{
 		router.route("api/fly*").handler(BodyHandler.create());
 		router.get("/api/fly").handler(this::getAllWithConnectionFLY);
 		router.get("/api/fy/:id").handler(this::getById_Fly);
-		router.post("/api/fly").handler(this::postFly);
 		
 		router.route("api/airport*").handler(BodyHandler.create());
 		router.get("/api/airport").handler(this::getAllWithConnectionAIRPORT);
 		router.get("/api/airport/:id").handler(this::getById_Airport);
-		router.post("/api/airport").handler(this::postAirport);
 	 
 		
 		
@@ -309,40 +307,13 @@ public class ApiRest extends AbstractVerticle{
 	}
 		
 		
-		private void postFly(RoutingContext routingContext){
-			final Fly fly = gson.fromJson(routingContext.getBodyAsString(), Fly.class);	
-			mySqlClient.preparedQuery("INSERT INTO dad_db_avion.fly (id_Fly, id_AirportDest, id_AirportOrig, plate, time_Dep, time_Arr) VALUES (?,?,?,?,?,?)", 	// no se que poner para que nos haga el post.
-					Tuple.of(fly.getId_Fly(), fly.getId_AirportDest(), fly.getId_AirportOrig(), fly.getPlate(), fly.getTime_Dep(), fly.getTime_Arr()),handler -> {	
-					if (handler.succeeded()) {
-						routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
-						.end("Vuelo registrado");
-						System.out.println(JsonObject.mapFrom(usuario).encodePrettily()+"\n Vuelo registrado");
-					}else {
-						routingContext.response().setStatusCode(401).putHeader("content-type", "application/json")
-						.end((JsonObject.mapFrom(handler.cause()).encodePrettily()));
-						System.out.println("Error"+handler.cause().getLocalizedMessage());
-					}
-				});
-	}
 		
-		private void postAirport(RoutingContext routingContext){
-			final Airport airport = gson.fromJson(routingContext.getBodyAsString(), Airport.class);	
-			mySqlClient.preparedQuery("INSERT INTO dad_db_avion.airport (id_Airport, name, lat, lon) VALUES (?,?,?,?)", 	// no se que poner para que nos haga el post.
-					Tuple.of(airport.getId_Airport(), airport.getName(), airport.getLat(), airport.getLon()),handler -> {	
-					if (handler.succeeded()) {
-						routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
-						.end("Aeropuerto registrado");
-						System.out.println(JsonObject.mapFrom(usuario).encodePrettily()+"\n Aeropuerto registrado");
-					}else {
-						routingContext.response().setStatusCode(401).putHeader("content-type", "application/json")
-						.end((JsonObject.mapFrom(handler.cause()).encodePrettily()));
-						System.out.println("Error"+handler.cause().getLocalizedMessage());
-					}
-				});
-	}
+		
+	
 	
 	
 	
 	
 	
 }
+
