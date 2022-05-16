@@ -41,7 +41,6 @@ public class MqttClientVerticleGps extends AbstractVerticle{
 		});
 
 	}
-
 }
 //[
 // '{{repeat(5, 7)}}',

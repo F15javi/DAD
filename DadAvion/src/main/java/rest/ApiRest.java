@@ -19,7 +19,6 @@ import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
 import io.vertx.sqlclient.Tuple;
 import clases.Gps;
-import clases.Usuario;
 import clases.Fly;
 
 import com.google.gson.Gson;
