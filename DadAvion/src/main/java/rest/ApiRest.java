@@ -33,7 +33,8 @@ public class ApiRest extends AbstractVerticle{
 	private MqttClient mqtt_client;
 	@Override
 	public void start(Promise<Void> startPromise) {
-		
+		gson = new Gson();
+
 		
 		MySQLConnectOptions connectOptions = new MySQLConnectOptions().setPort(3306).setHost("localhost")
 				.setDatabase("dad_db_avion").setUser("root").setPassword("rootroot");
@@ -61,30 +62,25 @@ public class ApiRest extends AbstractVerticle{
 		router.post("/api/gps").handler(this::postGps);
 		
 		
-		router.route("api/fly*").handler(BodyHandler.create());
+		router.route("/api/fly*").handler(BodyHandler.create());
 		router.get("/api/fly").handler(this::getAllWithConnectionFLY);
 		router.get("/api/fy/:id").handler(this::getById_Fly);
 		
-		router.route("api/airport*").handler(BodyHandler.create());
+		router.route("/api/airport*").handler(BodyHandler.create());
 		router.get("/api/airport").handler(this::getAllWithConnectionAIRPORT);
 		router.get("/api/airport/:id").handler(this::getById_Airport);
 	 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 		
-		
-		MqttClient mqttClient = MqttClient.create(vertx, new MqttClientOptions().setAutoKeepAlive(true).setUsername("admin").setPassword("admin"));
-		mqttClient.connect(1883, "localhost", connection -> {
-		
-			if(connection.succeeded()) {
-				System.out.println("Nombre del cliente: " + connection.result().code().name());
-				
-				//subscripcion
-				mqtt_client.subscribe("topic_1", MqttQoS.AT_LEAST_ONCE.value(), handler -> {
-					if(handler.succeeded()) {
-						System.out.println("Subscripcion realizada correctamente");
-					}else {
-						System.out.println("Fallo en la subscripcion");
-					}
-				});
+		MqttClient mqttClient = MqttClient.create(vertx, new MqttClientOptions().setAutoKeepAlive(true));
+		mqttClient.connect(1883, "localhost", s -> {
+
+			mqttClient.subscribe("topic_2", MqttQoS.AT_LEAST_ONCE.value(), handler -> {
+				if (handler.succeeded()) {
+					System.out.println("Suscripción " + mqttClient.clientId());
+				}
+			});
+
 			mqttClient.publishHandler(handler -> {
 				System.out.println("Mensaje recibido:");
 				System.out.println("    Topic: " + handler.topicName().toString());
@@ -98,11 +94,8 @@ public class ApiRest extends AbstractVerticle{
 				}
 			});
 			mqttClient.publish("topic_1", Buffer.buffer("Ejemplo"), MqttQoS.AT_LEAST_ONCE, false, false);
-
-		}else {
-			System.out.println("Error en la conexión con el broker");
-			}
 		});
+
 	
 		getAll();
 		
