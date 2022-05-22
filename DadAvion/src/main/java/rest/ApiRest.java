@@ -292,6 +292,8 @@ public class ApiRest extends AbstractVerticle{
 					routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
 					.end("Gps registrado");
 					System.out.println(JsonObject.mapFrom(gps).encodePrettily()+"\n Gps registrado");
+					
+					//añadir consulta sql
 				}else {
 					routingContext.response().setStatusCode(401).putHeader("content-type", "application/json")
 					.end((JsonObject.mapFrom(handler.cause()).encodePrettily()));

@@ -6,8 +6,8 @@
    This sample sketch demonstrates the normal use of a TinyGPSPlus (TinyGPSPlus) object.
    It requires the use of SoftwareSerial, and assumes that you have a
    4800-baud serial GPS device hooked up on pins 4(rx) and 3(tx).
-*/
-static const int RXPin = 2, TXPin = 0;
+*///               D3            D4
+static const int RXPin = 0, TXPin = 2;
 int last = 0;
 
 // The TinyGPSPlus object
