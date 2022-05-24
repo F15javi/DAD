@@ -21,6 +21,8 @@ SoftwareSerial ss(RXPin, TXPin);
 
 int test_delay = 1000; //so we don't spam the API
 boolean describe_tests = true;
+//REST
+RestClient restclient = RestClient("192.168.43.253", 80);//IP del servidor
 
 
 //MQTT
@@ -37,7 +39,7 @@ char msg[50];
 
 String response;
 
-String serializeBody(int id_Gps, int id_Fly, double lat, double lon, int dir, double vel, double alt, long time) // cambiar para nuestro gps
+String serializeBody(int id_Fly, double lat, double lon, int dir, double vel, double alt) // cambiar para nuestro gps
 {
   StaticJsonDocument<200> doc;
 
@@ -48,14 +50,12 @@ String serializeBody(int id_Gps, int id_Fly, double lat, double lon, int dir, do
 
   // Add values in the document
   //
-  doc["id_Gps"] = id_Gps;//modificar esto tambien
-  doc["id_Fly"] = id_Fly;
+  doc["id_Fly"] = id_Fly;//nuesstro vuelo
   doc["lat"] = lat;
   doc["lon"] = lon;
   doc["dir"] = dir;
   doc["vel"] = vel;
   doc["alt"] = alt;
-  doc["time"] = time;
 
 
 
@@ -124,14 +124,12 @@ void deserializeBody(String responseJson){
   
 
     // Print values.
-    Serial.println(id_Gps);
     Serial.println(id_Fly);
     Serial.println(lat);
     Serial.println(lon);
     Serial.println(dir);
     Serial.println(vel);
     Serial.println(alt);
-    Serial.println(time);
 
   }
 }
@@ -243,6 +241,22 @@ void reconnect() {
 }
  
 
+
+void POST_tests()
+{
+   Serial.write("No GPS detected: check wiring.");
+      int id_Fly = 1;//modificar manualmente
+      double lat = gps.location.lat();
+      double lon = gps.location.lng();
+      int dir = gps.course.deg();
+      double vel = gps.speed.kmph();
+      double alt = gps.altitude.meters(); 
+
+      String post_body = serializeBody(id_Fly,lat,lon,dir,vel,alt);
+  describe("Test POST with path and body and response");
+  test_status(restclient.post("/api/gps", post_body.c_str(), &response));
+  test_response();
+}
  
 void loop() {
  
@@ -256,23 +270,14 @@ void loop() {
 
   if (millis() > 5000 && gps.charsProcessed() < 10)
   {
-    Serial.write("No GPS detected: check wiring.");
+   
   }
-  int id_Fly = 1;//modificar manualmente
-  double lat = gps.location.lat();
-  double lon = gps.location.lng();
-  int dir = gps.course.deg();
-  double vel = gps.speed.kmph();
-  double alt = gps.altitude.meters(); 
-
-  String post_body = serializeBody(id_Fly,lat,lon,dir,vel,alt)
-                                  ; 
+ 
 
   long now = millis();
   if (now - lastMsg > 2000) {
     lastMsg = now;
     Serial.print("Publish message: ");
     Serial.println(msg);
-    client.publish("/api/gps", post_bo);
-  }
+ uhvhbbnnj   }
 }
