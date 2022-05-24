@@ -204,7 +204,7 @@ public class ApiRest extends AbstractVerticle{
 		Integer id_Gps = Integer.parseInt(routingContext.request().getParam("id_Gps"));
 		mySqlClient.getConnection(connection -> {
 			if (connection.succeeded()) {
-				connection.result().preparedQuery("SELECT * FROM dad_db_avion.gps WHERE id_Gps = '" + id_Gps + "'").execute(
+				connection.result().preparedQuery("SELECT * FROM dad_db_avion.gps WHERE id_Gps = ?").execute(
 						Tuple.of(id_Gps), res -> {
 							if (res.succeeded()) {
 								// Get the result set
@@ -233,7 +233,7 @@ public class ApiRest extends AbstractVerticle{
 		Integer id_Fly = Integer.parseInt(routingContext.request().getParam("id_Fly"));
 		mySqlClient.getConnection(connection -> {
 			if (connection.succeeded()) {
-				connection.result().preparedQuery("SELECT * FROM dad_db_avion.fly WHERE id_Fly = ? ").execute(
+				connection.result().preparedQuery("SELECT * FROM dad_db_avion.fly WHERE id_Fly = ?").execute(
 						Tuple.of(id_Fly), res -> {
 							if (res.succeeded()) {
 								// Get the result set
@@ -260,7 +260,7 @@ public class ApiRest extends AbstractVerticle{
 		Integer id_Airport = Integer.parseInt(routingContext.request().getParam("id_Airport"));
 		mySqlClient.getConnection(connection -> {
 			if (connection.succeeded()) {
-				connection.result().preparedQuery("SELECT * FROM dad_db_avion.airport WHERE id_Airport = '" + id_Airport + "'").execute(
+				connection.result().preparedQuery("SELECT * FROM dad_db_avion.airport WHERE id_Airport = ?").execute(
 						Tuple.of(id_Airport), res -> {
 							if (res.succeeded()) {
 								// Get the result set
