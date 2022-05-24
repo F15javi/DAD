@@ -21,6 +21,9 @@ import io.vertx.sqlclient.Tuple;
 import clases.Gps;
 import clases.Fly;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -107,13 +110,13 @@ public class ApiRest extends AbstractVerticle{
 				// Get the result set
 				RowSet<Row> resultSet = res.result();
 				System.out.println(resultSet.size());
-				JsonArray result = new JsonArray();
+				List<Gps> result = new ArrayList<>();
 				for (Row elem : resultSet) {
-					result.add(JsonObject.mapFrom(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
+					result.add(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
 							elem.getDouble("lat"), elem.getDouble("lon"),
-							elem.getInteger("dir"), elem.getDouble("vel"), elem.getDouble("alt"), elem.getLong("time"))));
+							elem.getInteger("dir"), elem.getDouble("vel"), elem.getDouble("alt"), elem.getLong("time")));
 				}
-				System.out.println(result.toString());
+				System.out.println(gson.toJson(result));
 			} else {
 				System.out.println("Error: " + res.cause().getLocalizedMessage());
 			}
@@ -128,14 +131,13 @@ public class ApiRest extends AbstractVerticle{
 						// Get the result set
 						RowSet<Row> resultSet = res.result();
 						System.out.println(resultSet.size());
-						JsonArray result = new JsonArray();
+						List<Gps> result = new ArrayList<>();
 						for (Row elem : resultSet) {
-							result.add(JsonObject
-									.mapFrom(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
+							result.add(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
 											elem.getDouble("lat"), elem.getDouble("lon"),
-											elem.getInteger("dir"), elem.getDouble("vel"), elem.getDouble("alt"), elem.getLong("time"))));
+											elem.getInteger("dir"), elem.getDouble("vel"), elem.getDouble("alt"), elem.getLong("time")));
 						}
-						System.out.println(result.toString());
+						System.out.println(gson.toJson(result));
 					} else {
 						System.out.println("Error: " + res.cause().getLocalizedMessage());
 					}
@@ -156,13 +158,12 @@ public class ApiRest extends AbstractVerticle{
 						// Get the result set
 						RowSet<Row> resultSet = res.result();
 						System.out.println(resultSet.size());
-						JsonArray result = new JsonArray();
+						List<Fly> result = new ArrayList<>();
 						for (Row elem : resultSet) {
-							result.add(JsonObject
-									.mapFrom(new Fly(elem.getInteger("id_Fly"), elem.getInteger("id_AirporDest"), 
-											elem.getInteger("id_AirporOrig"), elem.getString("plate"),  elem.getLong("time_Dep"), elem.getLong("time_Arr"))));
+							result.add(new Fly(elem.getInteger("id_Fly"), elem.getInteger("id_AirporDest"), 
+											elem.getInteger("id_AirporOrig"), elem.getString("plate"),  elem.getLong("time_Dep"), elem.getLong("time_Arr")));
 						}
-						System.out.println(result.toString());
+						System.out.println(gson.toJson(result));
 					} else {
 						System.out.println("Error: " + res.cause().getLocalizedMessage());
 					}
@@ -182,13 +183,12 @@ public class ApiRest extends AbstractVerticle{
 						// Get the result set
 						RowSet<Row> resultSet = res.result();
 						System.out.println(resultSet.size());
-						JsonArray result = new JsonArray();
+						List<Airport> result = new ArrayList<>();
 						for (Row elem : resultSet) {
-							result.add(JsonObject
-									.mapFrom(new Airport(elem.getInteger("id_Airport"), elem.getString("name"), 
-											 elem.getDouble("lat"), elem.getDouble("lon"))));
+							result.add(new Airport(elem.getInteger("id_Airport"), elem.getString("name"), 
+											 elem.getDouble("lat"), elem.getDouble("lon")));
 						}
-						System.out.println(result.toString());
+						System.out.println(gson.toJson(result));
 					} else {
 						System.out.println("Error: " + res.cause().getLocalizedMessage());
 					}
@@ -210,13 +210,13 @@ public class ApiRest extends AbstractVerticle{
 								// Get the result set
 								RowSet<Row> resultSet = res.result();
 								System.out.println(resultSet.size());
-								JsonArray result = new JsonArray();
+								List<Gps> result = new ArrayList<>();
 								for (Row elem : resultSet) {
-									result.add(JsonObject.mapFrom(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
+									result.add(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
 											elem.getDouble("lat"), elem.getDouble("lon"), elem.getInteger("dir"), elem.getDouble("vel"), 
-											elem.getDouble("alt"), elem.getLong("time"))));
+											elem.getDouble("alt"), elem.getLong("time")));
 								}
-								System.out.println(result.toString());
+								System.out.println(gson.toJson(result));
 							} else {
 								System.out.println("Error: " + res.cause().getLocalizedMessage());
 							}
@@ -233,18 +233,18 @@ public class ApiRest extends AbstractVerticle{
 		Integer id_Fly = Integer.parseInt(routingContext.request().getParam("id_Fly"));
 		mySqlClient.getConnection(connection -> {
 			if (connection.succeeded()) {
-				connection.result().preparedQuery("SELECT * FROM dad_db_avion.fly WHERE id_Fly = '" + id_Fly + "'").execute(
+				connection.result().preparedQuery("SELECT * FROM dad_db_avion.fly WHERE id_Fly = ? ").execute(
 						Tuple.of(id_Fly), res -> {
 							if (res.succeeded()) {
 								// Get the result set
 								RowSet<Row> resultSet = res.result();
 								System.out.println(resultSet.size());
-								JsonArray result = new JsonArray();
+								List<Fly> result = new ArrayList<>();
 								for (Row elem : resultSet) {
-									result.add(JsonObject.mapFrom(new Fly(elem.getInteger("id_Fly"), elem.getInteger("id_AirporDest"), 
-											elem.getInteger("id_AirporOrig"), elem.getString("plate"),  elem.getLong("time_Dep"), elem.getLong("time_Arr"))));
+									result.add(new Fly(elem.getInteger("id_Fly"), elem.getInteger("id_AirporDest"), 
+											elem.getInteger("id_AirporOrig"), elem.getString("plate"),  elem.getLong("time_Dep"), elem.getLong("time_Arr")));
 								}
-								System.out.println(result.toString());
+								System.out.println(gson.toJson(result));
 							} else {
 								System.out.println("Error: " + res.cause().getLocalizedMessage());
 							}
@@ -266,12 +266,12 @@ public class ApiRest extends AbstractVerticle{
 								// Get the result set
 								RowSet<Row> resultSet = res.result();
 								System.out.println(resultSet.size());
-								JsonArray result = new JsonArray();
+								List<Airport> result = new ArrayList<>();
 								for (Row elem : resultSet) {
-									result.add(JsonObject.mapFrom(new Airport(elem.getInteger("id_Airport"), elem.getString("name"), 
-											 elem.getDouble("lat"), elem.getDouble("lon"))));
+									result.add(new Airport(elem.getInteger("id_Airport"), elem.getString("name"), 
+											 elem.getDouble("lat"), elem.getDouble("lon")));
 								}
-								System.out.println(result.toString());
+								System.out.println(gson.toJson(result));
 							} else {
 								System.out.println("Error: " + res.cause().getLocalizedMessage());
 							}
@@ -291,12 +291,12 @@ public class ApiRest extends AbstractVerticle{
 				if (handler.succeeded()) {
 					routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
 					.end("Gps registrado");
-					System.out.println(JsonObject.mapFrom(gps).encodePrettily()+"\n Gps registrado");
+					System.out.println(gson.toJson(gps));
 					
-					//añadir consulta sql
+					//AÃ±adir consulta sql
 				}else {
 					routingContext.response().setStatusCode(401).putHeader("content-type", "application/json")
-					.end((JsonObject.mapFrom(handler.cause()).encodePrettily()));
+					.end((gson.toJson(handler.cause())));
 					System.out.println("Error"+handler.cause().getLocalizedMessage());
 				}
 			});
