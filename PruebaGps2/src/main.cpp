@@ -2,6 +2,7 @@
 #include <ESP8266WiFi.h>
 #include <TinyGPSPlus.h>
 #include <SoftwareSerial.h>
+
 /*
    This sample sketch demonstrates the normal use of a TinyGPSPlus (TinyGPSPlus) object.
    It requires the use of SoftwareSerial, and assumes that you have a
@@ -21,10 +22,8 @@ void setup()
   Serial.begin(19200);
   ss.begin(9600);
 
-  Serial.write("DeviceExample.ino");
-  Serial.write("A simple demonstration of TinyGPSPlus with an attached GPS module");
-  Serial.write("Testing TinyGPSPlus library v. ");
-  Serial.write("by Mikal Hart");
+  Serial.write("Inicialización del Gps");
+  
 
 }
 
