@@ -35,7 +35,12 @@
 			<artifactId>vertx-mysql-client</artifactId>
 			<version>4.0.3</version>
 		</dependency>
-		
+		<dependency>
+         	<groupId>io.vertx</groupId>
+        	<artifactId>vertx-mqtt</artifactId>
+	     	<version>4.2.6</version>    
+    	</dependency>
+
 		<dependency>
           <groupId>io.netty</groupId>
           <artifactId>netty-resolver-dns-native-macos</artifactId>
