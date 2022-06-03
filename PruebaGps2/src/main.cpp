@@ -89,7 +89,7 @@ void loop()
 
   if (millis() > 5000 && gps.charsProcessed() < 10)
   {
-    Serial.write("No GPS detected: check wiring.");
+    Serial.println("No GPS detected: check wiring.");
   }
 }
 
