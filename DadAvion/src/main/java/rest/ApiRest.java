@@ -161,6 +161,20 @@ public class ApiRest extends AbstractVerticle{
 					.end(gson.toJson(gps));
 					System.out.println(gson.toJson(gps));
 					
+					
+					
+					
+					
+					
+					//SELECT * FROM (SELECT id_Gps, id_Fly, lat, lon, dir, vel, alt, time,
+					//		        ROW_NUMBER() OVER(PARTITION BY id_Fly ORDER BY time DESC) rn
+
+					//		    FROM dad_db_avion.gps where ST_Distance_Sphere(point(?,?),point(lat,lon))  <=57333.59
+
+					//		              ) a
+					//		WHERE rn = 1 and id_Fly != ?
+
+
 					mqttClient.publish("topic_1", Buffer.buffer("0"), MqttQoS.AT_LEAST_ONCE, false, false);
 
 					
