@@ -92,6 +92,7 @@ public class ApiRest extends AbstractVerticle{
 				}
 			});
 			mqttClient.publish("topic_1", Buffer.buffer("Ejemplo"), MqttQoS.AT_LEAST_ONCE, false, false);
+
 		});
 
 	
@@ -160,7 +161,7 @@ public class ApiRest extends AbstractVerticle{
 					.end(gson.toJson(gps));
 					System.out.println(gson.toJson(gps));
 					
-					mqttClient.publish("topic_1", Buffer.buffer("1"), MqttQoS.AT_LEAST_ONCE, false, false);
+					mqttClient.publish("topic_1", Buffer.buffer("0"), MqttQoS.AT_LEAST_ONCE, false, false);
 
 					
 					//AÃ±adir consulta sql
