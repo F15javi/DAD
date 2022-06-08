@@ -160,9 +160,9 @@ public class ApiRest extends AbstractVerticle {
 										connection.result().preparedQuery(
 												"SELECT * FROM (SELECT id_Gps, id_Fly, lat, lon, dir, vel, alt, time, "
 														+ "ROW_NUMBER() OVER(PARTITION BY id_Fly ORDER BY time DESC) "
-														+ "rn FROM dad_db_avion.gps where ST_Distance_Sphere(point(?,?),point(lat,lon))  <=57333.59 ) "
+														+ "rn FROM dad_db_avion.gps where ST_Distance_Sphere(point(?,?),point(lon,lat)) <= 4000 ) "
 														+ "a WHERE rn = 1 and id_Fly != ?")
-												.execute(Tuple.of(gps.getLat(), gps.getLon(), gps.getId_Fly()), res -> {
+												.execute(Tuple.of(gps.getLon(), gps.getLat(), gps.getId_Fly()), res -> {
 													if (res.succeeded()) {
 
 														mqttClient.publish("topic_1", Buffer.buffer("1"),

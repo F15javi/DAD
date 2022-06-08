@@ -12,7 +12,9 @@ RestClient resrClient = RestClient("192.168.43.253", 8080);//IP del servidor
 #define STASSID "le wifi"//Usuario
 #define STAPSK  "Javier15"//Contraseña
 const char* mqtt_server = "192.168.43.253";
-double lat_prueba = 40.0;
+double lat_prueba1 = 40.0;
+double lat_prueba2 = 39.9;
+
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -209,13 +211,28 @@ void describe(char *description)
     Serial.println(description);
 }
 
-void POST_tests()
+void POST_GPS1_TestProximidad()
 {
-  lat_prueba = lat_prueba + 0.000001; 
+  lat_prueba1 = lat_prueba1 - 0.001; 
   String post_body = serializeBody(1,
-                                  lat_prueba, 
-                                  89.515614, 
-                                  85,
+                                  lat_prueba1, 
+                                  89, 
+                                  180,
+                                  1000.0,
+                                  10000,
+                                  millis()//random esta loco
+                                  ); 
+  describe("Test POST with path and body and response");
+  test_status(resrClient.post("/api/gps", post_body.c_str(), &response));
+  test_response();
+}
+void POST_GPS2_TestProximidad()
+{
+  lat_prueba2 = lat_prueba2 + 0.001; 
+  String post_body = serializeBody(2,
+                                  lat_prueba2, 
+                                  89, 
+                                  0,
                                   1000.0,
                                   10000,
                                   millis()//random esta loco
@@ -239,8 +256,13 @@ void loop()
   client.loop();
 
 
- 
-  POST_tests();
+  POST_GPS1_TestProximidad();
+  POST_GPS2_TestProximidad();
+  long now = millis();
+  if (now - lastMsg > 10000) {
+    lastMsg = now;
+   
+  }
   
   
   
