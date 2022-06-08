@@ -17,7 +17,6 @@ double lat_prueba = 40.0;
 WiFiClient espClient;
 PubSubClient client(espClient);
 long lastMsg = 0;
-char msg[50] = "Hello there";
 
 void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
@@ -255,14 +254,7 @@ void loop()
   client.loop();
 
 
- /*
-  long now = millis();
-  if (now - lastMsg > 2000) {
-    lastMsg = now;
-    Serial.print("Publish message: ");
-    Serial.println(msg);
-    client.publish("topic_2", msg);
-  }*/
+ 
   POST_tests();
   
   
