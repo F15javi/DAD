@@ -71,7 +71,7 @@ public class ApiRest extends AbstractVerticle{
 		//Esto funciona ↓
 		
 		mqttClient = MqttClient.create(vertx, new MqttClientOptions().setAutoKeepAlive(true));
-		mqttClient.connect(1883, "192.168.43.253", s -> {
+		mqttClient.connect(1883, "192.168.43.253", s -> { //cambiar ip a la del ordenador que haga de servidor
 
 			mqttClient.subscribe("topic_2", MqttQoS.AT_LEAST_ONCE.value(), handler -> {
 				if (handler.succeeded()) {
@@ -95,7 +95,7 @@ public class ApiRest extends AbstractVerticle{
 		});
 
 	
-		getAll();		
+		//getAll();		
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	private void getAll() {
@@ -145,85 +145,32 @@ public class ApiRest extends AbstractVerticle{
 	
 
 
-//	private void getById_Gps(RoutingContext routingContext) {
-//		Integer id_Gps = Integer.parseInt(routingContext.request().getParam("id_Gps"));
-//		mySqlClient.getConnection(connection -> {
-//			if (connection.succeeded()) {
-//				connection.result().preparedQuery("SELECT * FROM dad_db_avion.gps WHERE id_Gps = ?").execute(
-//						Tuple.of(id_Gps), res -> {
-//							if (res.succeeded()) {
-//								// Get the result set
-//								RowSet<Row> resultSet = res.result();
-//								System.out.println(resultSet.size());
-//								List<Gps> result = new ArrayList<>();
-//								for (Row elem : resultSet) {
-//									result.add(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
-//											elem.getDouble("lat"), elem.getDouble("lon"), elem.getInteger("dir"), elem.getDouble("vel"), 
-//											elem.getDouble("alt"), elem.getLong("time")));
-//								}
-//								System.out.println(gson.toJson(result));
-//							} else {
-//								System.out.println("Error: " + res.cause().getLocalizedMessage());
-//							}
-//							connection.result().close();
-//						});
-//			} else {
-//				System.out.println(connection.cause().toString());
-//			}
-//		});
-//	}
-//	
-	
 
-//	private void postGps2(RoutingContext routingContext) {
-//		final Gps gps = gson.fromJson(routingContext.getBodyAsString(), Gps.class);
-//		gps.setTime(System.currentTimeMillis());
-//			mySqlClient.getConnection(connection -> {
-//				if (connection.succeeded()) {
-//					connection.result().preparedQuery("INSERT INTO dad_db_avion.gps (id_Fly, lat, lon, dir, vel, alt, time) VALUES (?,?,?,?,?,?,?)").
-//					execute(Tuple.of(gps.getId_Fly(), gps.getLat(), gps.getLon(), gps.getDir(), gps.getVel(), gps.getAlt(), gps.getTime()),res -> {
-//						if(res.succeeded()) {
-//							System.out.println("===========");
-//							System.out.println(LocalDate.now().toString() + "--> Registro insertado ---");
-//							System.out.println(gps);
-//							System.out.println("===========");
-//							System.out.println();
-//							routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
-//							.end(gson.toJson(gps));
-//
-//						}else {
-//							System.out.println("===========");
-//							System.out.println(LocalDate.now().toString() + "--> Error" + res.cause().getLocalizedMessage());
-//							routingContext.response().putHeader("content-type","application/json; charset=utf-8").setStatusCode(401).end("Registro Insertado --");
-//							System.out.println("===========");
-//							System.out.println();
-//						}
-//						connection.result().close();
-//					});
-//				}
-//			});
-//	}
+
 
 	
-//	private void postGps(RoutingContext routingContext){
-//		final Gps gps = gson.fromJson(routingContext.getBodyAsString(), Gps.class);	
-//		//gps.setTime(System.currentTimeMillis());
-//		mySqlClient.preparedQuery("INSERT INTO dad_db_avion.gps (id_Fly, lat, lon, dir, vel, alt, time) VALUES (?,?,?,?,?,?,?)")
-//				.execute(Tuple.of(gps.getId_Fly(), gps.getLat(), gps.getLon(), gps.getDir(), gps.getVel(), gps.getAlt(), gps.getTime()) 	
-//				,handler -> {	
-//				if (handler.succeeded()) {
-//					routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
-//					.end(gson.toJson(gps));
-//					System.out.println(gson.toJson(gps));
-//					
-//					//AÃ±adir consulta sql
-//				}else {
-//					routingContext.response().setStatusCode(401).putHeader("content-type", "application/json")
-//					.end((gson.toJson(handler.cause())));
-//					System.out.println("Error"+handler.cause().getLocalizedMessage());
-//				}
-//			});
-//	}
+	private void postGps(RoutingContext routingContext){
+		final Gps gps = gson.fromJson(routingContext.getBodyAsString(), Gps.class);	
+		//gps.setTime(System.currentTimeMillis());
+		mySqlClient.preparedQuery("INSERT INTO dad_db_avion.gps (id_Fly, lat, lon, dir, vel, alt, time) VALUES (?,?,?,?,?,?,?)")
+				.execute(Tuple.of(gps.getId_Fly(), gps.getLat(), gps.getLon(), gps.getDir(), gps.getVel(), gps.getAlt(), gps.getTime()) 	
+				,handler -> {	
+				if (handler.succeeded()) {
+					routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
+					.end(gson.toJson(gps));
+					System.out.println(gson.toJson(gps));
+					
+					mqttClient.publish("topic_1", Buffer.buffer("1"), MqttQoS.AT_LEAST_ONCE, false, false);
+
+					
+					//AÃ±adir consulta sql
+				}else {
+					routingContext.response().setStatusCode(401).putHeader("content-type", "application/json")
+					.end((gson.toJson(handler.cause())));
+					System.out.println("Error"+handler.cause().getLocalizedMessage());
+				}
+			});
+	}
 	
 }
 
