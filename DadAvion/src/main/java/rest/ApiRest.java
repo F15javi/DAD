@@ -30,35 +30,34 @@ import com.google.gson.JsonSyntaxException;
 
 import clases.Airport;
 
-public class ApiRest extends AbstractVerticle{
+public class ApiRest extends AbstractVerticle {
 
 	private MySQLPool mySqlClient;
 	Gson gson;
 	private MqttClient mqttClient;
+
 	@Override
 	public void start(Promise<Void> startPromise) {
 		gson = new Gson();
 
-		
 		MySQLConnectOptions connectOptions = new MySQLConnectOptions().setPort(3306).setHost("localhost")
 				.setDatabase("dad_db_avion").setUser("root").setPassword("rootroot");
 		PoolOptions poolOptions = new PoolOptions().setMaxSize(5);// numero maximo de conexiones
-		
+
 		mySqlClient = MySQLPool.pool(vertx, connectOptions, poolOptions);
-		
+
 		Router router = Router.router(vertx); // Permite canalizar las peticiones
-		
-		//Creacion de un servidor http, recibe por parametro el puerto, el resultado
+
+		// Creacion de un servidor http, recibe por parametro el puerto, el resultado
 		vertx.createHttpServer().requestHandler(router::handle).listen(8080, result -> {
 			if (result.succeeded()) {
 				startPromise.complete();
-			}else {
+			} else {
 				startPromise.fail(result.cause());
 			}
 		});
 
-	
-	// Definimos la rutas que se le pasan al servido http
+		// Definimos la rutas que se le pasan al servido http
 		router.route("/api/*").handler(BodyHandler.create());
 //		router.get("/api/gps").handler(this::getAllWithConnectionGPS);
 //		router.get("/api/gps/:id").handler(this::getById_Gps);
@@ -67,11 +66,11 @@ public class ApiRest extends AbstractVerticle{
 //		
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
-		
-		//Esto funciona ↓
-		
+
+		// Esto funciona ↓
+
 		mqttClient = MqttClient.create(vertx, new MqttClientOptions().setAutoKeepAlive(true));
-		mqttClient.connect(1883, "192.168.43.253", s -> { //cambiar ip a la del ordenador que haga de servidor
+		mqttClient.connect(1883, "192.168.43.253", s -> { // cambiar ip a la del ordenador que haga de servidor
 
 			mqttClient.subscribe("topic_2", MqttQoS.AT_LEAST_ONCE.value(), handler -> {
 				if (handler.succeeded()) {
@@ -85,9 +84,9 @@ public class ApiRest extends AbstractVerticle{
 				System.out.println("    Id del mensaje: " + handler.messageId());
 				System.out.println("    Contenido: " + handler.payload().toString());
 				try {
-				Gps g = gson.fromJson(handler.payload().toString(), Gps.class);
-				System.out.println("    Gps: " + g.toString());
-				}catch (JsonSyntaxException e) {
+					Gps g = gson.fromJson(handler.payload().toString(), Gps.class);
+					System.out.println("    Gps: " + g.toString());
+				} catch (JsonSyntaxException e) {
 					System.out.println("    No es un Gps. ");
 				}
 			});
@@ -95,9 +94,9 @@ public class ApiRest extends AbstractVerticle{
 
 		});
 
-	
-		//getAll();		
+		// getAll();
 	}
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	private void getAll() {
 		mySqlClient.query("SELECT * FROM dad_db_avion.gps;").execute(res -> {
@@ -107,9 +106,9 @@ public class ApiRest extends AbstractVerticle{
 				System.out.println(resultSet.size());
 				List<Gps> result = new ArrayList<>();
 				for (Row elem : resultSet) {
-					result.add(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
-							elem.getDouble("lat"), elem.getDouble("lon"),
-							elem.getInteger("dir"), elem.getDouble("vel"), elem.getDouble("alt"), elem.getLong("time")));
+					result.add(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"), elem.getDouble("lat"),
+							elem.getDouble("lon"), elem.getInteger("dir"), elem.getDouble("vel"), elem.getDouble("alt"),
+							elem.getLong("time")));
 				}
 				System.out.println(gson.toJson(result));
 			} else {
@@ -117,10 +116,11 @@ public class ApiRest extends AbstractVerticle{
 			}
 		});
 	}
+
 	private void getAllWithConnectionGPS(RoutingContext routingContext) {
 		mySqlClient.getConnection(connection -> {
 			if (connection.succeeded()) {
-				connection.result().query("SELECT * FROM dad_db_avion.gps;").execute( res -> {
+				connection.result().query("SELECT * FROM dad_db_avion.gps;").execute(res -> {
 					if (res.succeeded()) {
 						// Get the result set
 						RowSet<Row> resultSet = res.result();
@@ -128,8 +128,8 @@ public class ApiRest extends AbstractVerticle{
 						List<Gps> result = new ArrayList<>();
 						for (Row elem : resultSet) {
 							result.add(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
-											elem.getDouble("lat"), elem.getDouble("lon"),
-											elem.getInteger("dir"), elem.getDouble("vel"), elem.getDouble("alt"), elem.getLong("time")));
+									elem.getDouble("lat"), elem.getDouble("lon"), elem.getInteger("dir"),
+									elem.getDouble("vel"), elem.getDouble("alt"), elem.getLong("time")));
 						}
 						System.out.println(gson.toJson(result));
 					} else {
@@ -142,50 +142,46 @@ public class ApiRest extends AbstractVerticle{
 			}
 		});
 	}
-	
-	
 
+	private void postGps(RoutingContext routingContext) {
+		final Gps gps = gson.fromJson(routingContext.getBodyAsString(), Gps.class);
+		// gps.setTime(System.currentTimeMillis());
+		mySqlClient.getConnection(connection -> {
+			if (connection.succeeded()) {
+				connection.result().preparedQuery(
+						"INSERT INTO dad_db_avion.gps (id_Fly, lat, lon, dir, vel, alt, time) VALUES (?,?,?,?,?,?,?)")
+						.execute(Tuple.of(gps.getId_Fly(), gps.getLat(), gps.getLon(), gps.getDir(), gps.getVel(),
+								gps.getAlt(), gps.getTime()), handler -> {
+									if (handler.succeeded()) {
+										routingContext.response().setStatusCode(200)
+												.putHeader("content-type", "application/json").end(gson.toJson(gps));
+										// System.out.println(gson.toJson(gps));
 
+										connection.result().preparedQuery(
+												"SELECT * FROM (SELECT id_Gps, id_Fly, lat, lon, dir, vel, alt, time, "
+														+ "ROW_NUMBER() OVER(PARTITION BY id_Fly ORDER BY time DESC) "
+														+ "rn FROM dad_db_avion.gps where ST_Distance_Sphere(point(?,?),point(lat,lon))  <=57333.59 ) "
+														+ "a WHERE rn = 1 and id_Fly != ?")
+												.execute(Tuple.of(gps.getLat(), gps.getLon(), gps.getId_Fly()), res -> {
+													if (res.succeeded()) {
 
+														mqttClient.publish("topic_1", Buffer.buffer("1"),
+																MqttQoS.AT_LEAST_ONCE, false, false);
 
+													}
+													connection.result().close();
+												});
+									} else {
+										routingContext.response().setStatusCode(401).putHeader("content-type", "application/json").end();
+										connection.result().close();
+									}
+								});
 
-	
-	private void postGps(RoutingContext routingContext){
-		final Gps gps = gson.fromJson(routingContext.getBodyAsString(), Gps.class);	
-		//gps.setTime(System.currentTimeMillis());
-		mySqlClient.preparedQuery("INSERT INTO dad_db_avion.gps (id_Fly, lat, lon, dir, vel, alt, time) VALUES (?,?,?,?,?,?,?)")
-				.execute(Tuple.of(gps.getId_Fly(), gps.getLat(), gps.getLon(), gps.getDir(), gps.getVel(), gps.getAlt(), gps.getTime()) 	
-				,handler -> {	
-				if (handler.succeeded()) {
-					routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
-					.end(gson.toJson(gps));
-					System.out.println(gson.toJson(gps));
-					
-					
-					
-					
-					
-					
-					//SELECT * FROM (SELECT id_Gps, id_Fly, lat, lon, dir, vel, alt, time,
-					//		        ROW_NUMBER() OVER(PARTITION BY id_Fly ORDER BY time DESC) rn
-
-					//		    FROM dad_db_avion.gps where ST_Distance_Sphere(point(?,?),point(lat,lon))  <=57333.59
-
-					//		              ) a
-					//		WHERE rn = 1 and id_Fly != ?
-
-
-					mqttClient.publish("topic_1", Buffer.buffer("0"), MqttQoS.AT_LEAST_ONCE, false, false);
-
-					
-					//AÃ±adir consulta sql
-				}else {
-					routingContext.response().setStatusCode(401).putHeader("content-type", "application/json")
-					.end((gson.toJson(handler.cause())));
-					System.out.println("Error"+handler.cause().getLocalizedMessage());
-				}
-			});
+			} else {
+				routingContext.response().setStatusCode(401).putHeader("content-type", "application/json").end();
+				connection.result().close();
+			}
+		});
 	}
-	
-}
 
+}
