@@ -229,7 +229,7 @@ void POST_tests()
   lat_prueba = lat_prueba + 0.000001; 
   String post_body = serializeBody(1,
                                   lat_prueba, 
-                                  90.542384, 
+                                  89.515614, 
                                   85,
                                   1000.0,
                                   10000,
