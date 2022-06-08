@@ -209,21 +209,6 @@ void describe(char *description)
     Serial.println(description);
 }
 
-void GET_tests()
-{
-  describe("Test GET with path");
-  test_status(resrClient.get("/api/gps", &response));
-  test_response();
-
-  describe("Test GET with path and response");
-  test_status(resrClient.get("/api/gps", &response));
-  test_response();
-
-  describe("Test GET with path");
-  test_status(resrClient.get("/api/gps/123", &response));
-  test_response();
-}
-
 void POST_tests()
 {
   lat_prueba = lat_prueba + 0.000001; 
