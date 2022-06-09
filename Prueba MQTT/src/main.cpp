@@ -3,6 +3,18 @@
 #include "ArduinoJson.h"
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
+#include <TinyGPSPlus.h>
+#include <SoftwareSerial.h>
+
+
+//               D3            D4 Declaracion de los pines de para el gps
+static const int RXPin = 0, TXPin = 2;
+// Objeto gps
+TinyGPSPlus gps;
+// Objeto SoftwareSerial
+SoftwareSerial ss(RXPin, TXPin);
+
+
 
 int test_delay = 1000; //so we don't spam the API
 boolean describe_tests = true;
@@ -14,9 +26,11 @@ RestClient resrClient = RestClient("192.168.43.253", 8080);//IP del servidor
 const char* mqtt_server = "192.168.43.253";
 double lat_prueba1 = 40.0;
 double lat_prueba2 = 39.9;
+double alt_prueba = 700;
 
 
 WiFiClient espClient;
+
 PubSubClient client(espClient);
 long lastMsg = 0;
 
@@ -69,6 +83,9 @@ void setup()
 {
   
   pinMode(BUILTIN_LED, OUTPUT);
+  pinMode(4, OUTPUT);
+  digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off by making the voltage HIGH
+
   Serial.begin(9600);
   Serial.println();
   Serial.print("Connecting to ");
@@ -241,7 +258,7 @@ void POST_GPS1_TestProximidad()
 }
 void POST_GPS2_TestProximidad()
 {
-  lat_prueba2 = lat_prueba2 + 0.001; 
+  //lat_prueba2 = lat_prueba2 + 0.001; 
   String post_body = serializeBody(2,
                                   lat_prueba2, 
                                   89, 
@@ -257,8 +274,93 @@ void POST_GPS2_TestProximidad()
   delay(test_delay);
 }
 
+void POST_GPS1_TestDistancia()
+{
+  String post_body = serializeBody(1,
+                                  40, 
+                                  89, 
+                                  180,
+                                  1000.0,
+                                  10000,
+                                  millis()//random esta loco
+                                  ); 
+  //describe("Test POST with path and body and response");
+  //test_status(resrClient.post("/api/gps", post_body.c_str(), &response));
+  //test_response();
+  resrClient.post("/api/gps", post_body.c_str(), &response);
+  delay(test_delay);
+
+}
+void POST_GPS2_TestDistancia()
+{
+  String post_body = serializeBody(2,
+                                  40, 
+                                  89, 
+                                  0,
+                                  1000.0,
+                                  10000,
+                                  millis()//random esta loco
+                                  ); 
+  //describe("Test POST with path and body and response");
+  //test_status(resrClient.post("/api/gps", post_body.c_str(), &response));
+  //test_response();
+  resrClient.post("/api/gps", post_body.c_str(), &response);
+  delay(test_delay);
+}
 
 
+void POST_GPS_TestAltura()
+{
+  alt_prueba = alt_prueba - 10; 
+  String post_body = serializeBody(2,
+                                  40, 
+                                  89, 
+                                  0,
+                                  1000.0,
+                                  alt_prueba,
+                                  millis()//random esta loco
+                                  ); 
+  //describe("Test POST with path and body and response");
+  //test_status(resrClient.post("/api/gps", post_body.c_str(), &response));
+  //test_response();
+  resrClient.post("/api/gps", post_body.c_str(), &response);
+  delay(test_delay);
+
+  if(alt_prueba <= 500){
+
+    digitalWrite(4, HIGH);
+    Serial.println("Pull up");
+
+  }else if (alt_prueba > 500){
+      digitalWrite(4, LOW);
+      Serial.println("OK");
+
+  }else{
+    Serial.println("Crash");
+  }
+
+
+
+}
+
+void check_alt_gps(){
+
+  if(gps.altitude.meters()<=500){
+
+    digitalWrite(4, HIGH);
+    Serial.println("Pull up");
+
+  }else if (gps.altitude.meters() > 500){
+      digitalWrite(4, LOW);
+      Serial.println("OK");
+
+  }else{
+    Serial.println("Crash");
+  }
+
+
+
+}
 
 
 
@@ -274,7 +376,9 @@ void loop()
   POST_GPS1_TestProximidad();
   POST_GPS2_TestProximidad();
   
+  //POST_GPS1_TestDistancia();
+  //POST_GPS2_TestDistancia();
   
-  
-  
+  //POST_GPS_TestAltura();
+  //check_alt_gps();
 }
