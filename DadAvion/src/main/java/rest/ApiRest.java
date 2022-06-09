@@ -58,12 +58,16 @@ public class ApiRest extends AbstractVerticle {
 		});
 
 		// Definimos la rutas que se le pasan al servido http
+		
+		//Rutas de acceso para GPS ↓
 		router.route("/api/*").handler(BodyHandler.create());
 		router.get("/api/gps").handler(this::getAllWithConnectionGPS);
-//		router.get("/api/gps/:id").handler(this::getById_Gps);
+		router.get("/api/gps/:id").handler(this::getById_Gps);
 		router.post("/api/gps").handler(this::postGps);
-//		
-//		
+		
+		// Rutas de acceso para Fly ↓
+		router.get("/api/fly").handler(this::getFly);
+		
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 
@@ -116,11 +120,39 @@ public class ApiRest extends AbstractVerticle {
 			}
 		});
 	}
-
+	
+	// Peticiones del GPS ↓
+	
 	private void getAllWithConnectionGPS(RoutingContext routingContext) {
 		mySqlClient.getConnection(connection -> {
 			if (connection.succeeded()) {
 				connection.result().query("SELECT * FROM dad_db_avion.gps;").execute(res -> {
+					if (res.succeeded()) {
+						// Get the result set
+						RowSet<Row> resultSet = res.result();
+						System.out.println(resultSet.size());
+						List<Gps> result = new ArrayList<>();
+						for (Row elem : resultSet) {
+							result.add(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
+									elem.getDouble("lat"), elem.getDouble("lon"), elem.getInteger("dir"),
+									elem.getDouble("vel"), elem.getDouble("alt"), elem.getLong("time")));
+						}
+						System.out.println(gson.toJson(result));
+					} else {
+						System.out.println("Error: " + res.cause().getLocalizedMessage());
+					}
+					connection.result().close();
+				});
+			} else {
+				System.out.println(connection.cause().toString());
+			}
+		});
+	}
+
+	private void getById_Gps(RoutingContext routingContext) {
+		mySqlClient.getConnection(connection -> {
+			if (connection.succeeded()) {
+				connection.result().query("SELECT * FROM dad_db_avion.gps where id_Gps = ?;").execute(res -> {
 					if (res.succeeded()) {
 						// Get the result set
 						RowSet<Row> resultSet = res.result();
@@ -183,5 +215,57 @@ public class ApiRest extends AbstractVerticle {
 			}
 		});
 	}
+	
+	// Peticiones Fly ↓
+	
+	private void getFly(RoutingContext routingContext) {
+		mySqlClient.preparedQuery("SELECT * FROM dad_db_avion.fly;").execute( res -> {
+					if (res.succeeded()) {
+						// Get the result set
+						RowSet<Row> resultSet = res.result();
+						System.out.println(resultSet.size());
+						List<Fly> result = new ArrayList<>();
+						for (Row elem : resultSet) {
+							result.add(new Fly(elem.getInteger("id_Fly"), elem.getInteger("id_AirporDest"), 
+											elem.getInteger("id_AirporOrig"), elem.getString("plate"),  elem.getLong("time_Dep"), elem.getLong("time_Arr")));
+						}
+						routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
+						.end(gson.toJson(result));
+					} else {
+						routingContext.response().setStatusCode(400).putHeader("content-type", "application/json")
+						.end();
+					}
+					
+		});
 
+	}
+	
+	
+	
+//	private void getTermometro(RoutingContext routingContext) {
+//
+//		mySqlClient.preparedQuery("SELECT * FROM dad_database.termometro ORDER BY termometrocol DESC LIMIT 1")
+//				.execute(res -> {
+//					if (res.succeeded()) {
+//						// Get the result set
+//						RowSet<Row> resultSet = res.result();
+//						System.out.println(resultSet.size());
+//						List<Termometro> result = new ArrayList<>();
+//						for (Row elem : resultSet) {
+//							result.add(new Termometro(elem.getInteger("termometroId"), elem.getInteger("pistaId"),
+//									elem.getDouble("temperatura"), elem.getDouble("humedad"),
+//									elem.getLong("timestamp")));
+//						}
+//						routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
+//						.end(gson.toJson(result));
+//					} else {
+//						routingContext.response().setStatusCode(400).putHeader("content-type", "application/json")
+//								.end();
+	
+	
+	
+	// Peticiones del Airport ↓
+
+
+	
 }
