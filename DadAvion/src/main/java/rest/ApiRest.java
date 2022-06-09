@@ -59,7 +59,7 @@ public class ApiRest extends AbstractVerticle {
 
 		// Definimos la rutas que se le pasan al servido http
 		router.route("/api/*").handler(BodyHandler.create());
-//		router.get("/api/gps").handler(this::getAllWithConnectionGPS);
+		router.get("/api/gps").handler(this::getAllWithConnectionGPS);
 //		router.get("/api/gps/:id").handler(this::getById_Gps);
 		router.post("/api/gps").handler(this::postGps);
 //		
@@ -155,7 +155,8 @@ public class ApiRest extends AbstractVerticle {
 									if (handler.succeeded()) {
 										routingContext.response().setStatusCode(200)
 												.putHeader("content-type", "application/json").end(gson.toJson(gps));
-										// System.out.println(gson.toJson(gps));
+										System.out.println(gson.toJson(gps));
+										mqttClient.publish("topic_1", Buffer.buffer("0"), MqttQoS.AT_LEAST_ONCE, false, false);
 
 										connection.result().preparedQuery(
 												"SELECT * FROM (SELECT id_Gps, id_Fly, lat, lon, dir, vel, alt, time, "
@@ -165,8 +166,7 @@ public class ApiRest extends AbstractVerticle {
 												.execute(Tuple.of(gps.getLon(), gps.getLat(), gps.getId_Fly()), res -> {
 													if (res.succeeded()) {
 
-														mqttClient.publish("topic_1", Buffer.buffer("1"),
-																MqttQoS.AT_LEAST_ONCE, false, false);
+														//mqttClient.publish("topic_1", Buffer.buffer("1"), MqttQoS.AT_LEAST_ONCE, false, false);
 
 													}
 													connection.result().close();
