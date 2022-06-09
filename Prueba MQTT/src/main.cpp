@@ -28,12 +28,22 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.print((char)payload[i]);
   }
   Serial.println();
- 
-  if ((char)payload[0] == '1') {
-    digitalWrite(BUILTIN_LED, LOW);
-  } else {
-    digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off by making the voltage HIGH
+
+  
+  long now = millis();
+  if (now - lastMsg > 10000) {
+    lastMsg = now;
+    Serial.print("10 segundos");
+    if ((char)payload[0] == '1') {
+      digitalWrite(BUILTIN_LED, LOW);
+    } else {
+      digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off by making the voltage HIGH
+    }
+    
   }
+ 
+  
+  
  
 }
 
@@ -222,9 +232,12 @@ void POST_GPS1_TestProximidad()
                                   10000,
                                   millis()//random esta loco
                                   ); 
-  describe("Test POST with path and body and response");
-  test_status(resrClient.post("/api/gps", post_body.c_str(), &response));
-  test_response();
+  //describe("Test POST with path and body and response");
+  //test_status(resrClient.post("/api/gps", post_body.c_str(), &response));
+  //test_response();
+  resrClient.post("/api/gps", post_body.c_str(), &response);
+  delay(test_delay);
+
 }
 void POST_GPS2_TestProximidad()
 {
@@ -237,9 +250,11 @@ void POST_GPS2_TestProximidad()
                                   10000,
                                   millis()//random esta loco
                                   ); 
-  describe("Test POST with path and body and response");
-  test_status(resrClient.post("/api/gps", post_body.c_str(), &response));
-  test_response();
+  //describe("Test POST with path and body and response");
+  //test_status(resrClient.post("/api/gps", post_body.c_str(), &response));
+  //test_response();
+  resrClient.post("/api/gps", post_body.c_str(), &response);
+  delay(test_delay);
 }
 
 
@@ -258,11 +273,7 @@ void loop()
 
   POST_GPS1_TestProximidad();
   POST_GPS2_TestProximidad();
-  long now = millis();
-  if (now - lastMsg > 10000) {
-    lastMsg = now;
-   
-  }
+  
   
   
   
