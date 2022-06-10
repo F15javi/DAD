@@ -43,19 +43,30 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
   Serial.println();
 
-  
+  //Comprueba el valor de llegada del mqtt si es 1 enciende led en caso contrario apagalo
   long now = millis();
   if (now - lastMsg > 10000) {
     lastMsg = now;
     Serial.print("10 segundos");
     if ((char)payload[0] == '1') {
-      digitalWrite(5, LOW);   //Si queremos que se encienda el BUILTIN_LED cambiamos el 5 por BUILTIN_LED
+      digitalWrite(5, HIGH);   //Si queremos que se encienda el BUILTIN_LED cambiamos el 5 por BUILTIN_LED
     } else {
-      digitalWrite(5, HIGH);  // Turn the LED off by making the voltage HIGH  //Lo mismo qeu arriba
+      digitalWrite(5, LOW);  // Turn the LED off by making the voltage HIGH  //Lo mismo qeu arriba
     }
     
   }
- 
+  if(alt_prueba <= 500){
+
+    digitalWrite(4, HIGH);
+    Serial.println("Pull up");
+
+  }else if (alt_prueba > 500){
+      digitalWrite(4, LOW);
+      Serial.println("OK");
+
+  }else{
+    Serial.println("Crash");
+  }
   
   
  
@@ -64,9 +75,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
 void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
-    if (client.connect("Avion_2")) {
+    if (client.connect("Avion_1")) {
       Serial.println("connected");
-      client.subscribe("topic_2");    //Cambiar dependiendo de la placa
+      client.subscribe("topic_1");    //Cambiar dependiendo de la placa
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -242,13 +253,14 @@ void describe(char *description)
 
 void POST_GPS1_TestProximidad()
 {
-  lat_prueba1 = lat_prueba1 - 0.001; 
+  lat_prueba1 = lat_prueba1 - 0.001;
+  alt_prueba = alt_prueba - 10; 
   String post_body = serializeBody(1,
                                   lat_prueba1, 
                                   89, 
                                   180,
                                   1000.0,
-                                  10000,
+                                  alt_prueba,
                                   millis()//random esta loco
                                   ); 
   //describe("Test POST with path and body and response");
@@ -375,8 +387,8 @@ void loop()
   client.loop();
 
 
-  //POST_GPS1_TestProximidad();
-  POST_GPS2_TestProximidad();
+  POST_GPS1_TestProximidad();
+  //POST_GPS2_TestProximidad();
   
   //POST_GPS1_TestDistancia();
   //POST_GPS2_TestDistancia();
