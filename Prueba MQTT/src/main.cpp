@@ -24,7 +24,7 @@ RestClient resrClient = RestClient("192.168.43.253", 8080);//IP del servidor
 #define STASSID "le wifi"//Usuario
 #define STAPSK  "Javier15"//Contraseña
 const char* mqtt_server = "192.168.43.253";
-double lat_prueba1 = 40.0;
+double lat_prueba1 = 39.95;
 double lat_prueba2 = 39.9;
 double alt_prueba = 700;
 
@@ -260,7 +260,7 @@ void POST_GPS2_TestProximidad()
 {
   //lat_prueba2 = lat_prueba2 + 0.001; 
   String post_body = serializeBody(2,
-                                  lat_prueba2, 
+                                  39.9, 
                                   89, 
                                   0,
                                   1000.0,
