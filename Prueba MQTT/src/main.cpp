@@ -59,15 +59,28 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
     
   }
+  
+  if(alt_prueba <= 500){
+
+    digitalWrite(4, HIGH);
+    Serial.println("Pull up");
+
+  }else if (alt_prueba > 500){
+      digitalWrite(4, LOW);
+      Serial.println("OK");
+
+  }else{
+    Serial.println("Crash");
+  }
 
 }
 
 void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
-    if (client.connect("Avion_2")) {   //Cambiamos dependiendo de la placa también
+    if (client.connect("Avion_1")) {   //Cambiamos dependiendo de la placa también
       Serial.println("connected");
-      client.subscribe("topic_2");    //Cambiar dependiendo de la placa
+      client.subscribe("topic_1");    //Cambiar dependiendo de la placa
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -264,13 +277,14 @@ void POST_GPS()
 }
 void POST_GPS1_TestProximidad()
 {
-  lat_prueba1 = lat_prueba1 - 0.001; 
+  lat_prueba1 = lat_prueba1 - 0.001;
+  alt_prueba = alt_prueba - 10; 
   String post_body = serializeBody(1,
                                   lat_prueba1, 
                                   89, 
                                   180,
                                   1000.0,
-                                  10000,
+                                  alt_prueba,
                                   millis()//random esta loco
                                   ); 
   //describe("Test POST with path and body and response");
@@ -283,12 +297,13 @@ void POST_GPS1_TestProximidad()
 void POST_GPS2_TestProximidad()
 {
   lat_prueba2 = lat_prueba2 + 0.001; 
+  alt_prueba = alt_prueba + 10;
   String post_body = serializeBody(2,
                                   lat_prueba2, 
                                   89, 
                                   0,
                                   1000.0,
-                                  10000,
+                                  alt_prueba,
                                   millis()//random esta loco
                                   ); 
   //describe("Test POST with path and body and response");
@@ -397,8 +412,8 @@ void loop()
   //POST_GPS();       //Descomenta para ejecutar el GPS
 
 /////////////////////////////// PRUEBAS DE PROXIMIDAD /////////////////////////////// 
-  //POST_GPS1_TestProximidad();
-  POST_GPS2_TestProximidad();
+  POST_GPS1_TestProximidad();//proximida y altura descendindo
+  //POST_GPS2_TestProximidad();//proximidad y altura ascendiendo
   
 /////////////////////////////// PRUEBAS DE ALTURA /////////////////////////////// 
   //POST_GPS_TestAltura();
