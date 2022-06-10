@@ -6,7 +6,14 @@
 #include <TinyGPSPlus.h>
 #include <SoftwareSerial.h>
 
+//////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////// VARIABLES GENERALES //////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+double lat_prueba1 = 39.95;
+double lat_prueba2 = 39.9;
+double alt_prueba = 700;
 
+/////////////////////////////// SENSOR GPS ///////////////////////////////////////
 //               D3            D4           Declaracion de los pines de para el gps
 static const int RXPin = 0, TXPin = 2;
 // Objeto gps
@@ -15,25 +22,22 @@ TinyGPSPlus gps;
 SoftwareSerial ss(RXPin, TXPin);
 
 
-
+/////////////////////////////// CONEXIONES ///////////////////////////////////////
 int test_delay = 0; //so we don't spam the API
 boolean describe_tests = true;
 
+/////////////////////////////// CONEXIÓN WIFI ////////////////////////////////////
 RestClient resrClient = RestClient("192.168.43.253", 8080);//IP del servidor
 
 #define STASSID "le wifi"//Usuario
 #define STAPSK  "Javier15"//Contraseña
 const char* mqtt_server = "192.168.43.253";
-double lat_prueba1 = 39.95;
-double lat_prueba2 = 39.9;
-double alt_prueba = 700;
-
 
 WiFiClient espClient;
 
 PubSubClient client(espClient);
 long lastMsg = 0;
-
+/////////////////////////////// CONEXIÓN MQTT ////////////////////////////////////
 void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
@@ -43,7 +47,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
   Serial.println();
 
-  //Comprueba el valor de llegada del mqtt si es 1 enciende led en caso contrario apagalo
+  
   long now = millis();
   if (now - lastMsg > 10000) {
     lastMsg = now;
@@ -55,29 +59,15 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
     
   }
-  if(alt_prueba <= 500){
 
-    digitalWrite(4, HIGH);
-    Serial.println("Pull up");
-
-  }else if (alt_prueba > 500){
-      digitalWrite(4, LOW);
-      Serial.println("OK");
-
-  }else{
-    Serial.println("Crash");
-  }
-  
-  
- 
 }
 
 void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
-    if (client.connect("Avion_1")) {
+    if (client.connect("Avion_2")) {   //Cambiamos dependiendo de la placa también
       Serial.println("connected");
-      client.subscribe("topic_1");    //Cambiar dependiendo de la placa
+      client.subscribe("topic_2");    //Cambiar dependiendo de la placa
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -89,7 +79,9 @@ void reconnect() {
 
 
 
-//Setup
+//////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////// FUNCION SETUP ////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
 void setup()
 {
   
@@ -97,7 +89,7 @@ void setup()
   pinMode(5, OUTPUT);     // D1 condicion de cercania
   pinMode(4, OUTPUT);     // D2 condicion de altura
   //digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off by making the voltage HIGH
-  digitalWrite(5, HIGH);  // Turn the LED off by making the voltage HIGH
+  digitalWrite(5, LOW);  // Turn the LED off by making the voltage HIGH
 
   Serial.begin(9600);
   Serial.println();
@@ -124,6 +116,9 @@ void setup()
   client.setCallback(callback);
 }
 
+//////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////// FUNCIONES AUXILIARES /////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
 String response;
 
 String serializeBody(int id_Fly, double lat, double lon, int dir, double vel, double alt, long time) // cambiar para nuestro gps
@@ -144,9 +139,6 @@ String serializeBody(int id_Fly, double lat, double lon, int dir, double vel, do
   doc["vel"] = vel;
   doc["alt"] = alt;
   doc["time"] = time;
-
-
-
 
   // Generate the minified JSON and send it to the Serial port.
   //
@@ -251,16 +243,34 @@ void describe(char *description)
     Serial.println(description);
 }
 
+/////////////////////////////// FUNCION DE SENSOR ///////////////////////////////
+
+void POST_GPS()
+{
+  String post_body = serializeBody(1,
+                                  gps.altitude.meters(), 
+                                  gps.location.lat(), 
+                                  gps.location.lng(),
+                                  gps.course.deg(),
+                                  gps.speed.kmph(),
+                                  millis()
+                                  ); 
+  //describe("Test POST with path and body and response");
+  //test_status(resrClient.post("/api/gps", post_body.c_str(), &response));
+  //test_response();
+  resrClient.post("/api/gps", post_body.c_str(), &response);
+  delay(test_delay);
+
+}
 void POST_GPS1_TestProximidad()
 {
-  lat_prueba1 = lat_prueba1 - 0.001;
-  alt_prueba = alt_prueba - 10; 
+  lat_prueba1 = lat_prueba1 - 0.001; 
   String post_body = serializeBody(1,
                                   lat_prueba1, 
                                   89, 
                                   180,
                                   1000.0,
-                                  alt_prueba,
+                                  10000,
                                   millis()//random esta loco
                                   ); 
   //describe("Test POST with path and body and response");
@@ -287,7 +297,6 @@ void POST_GPS2_TestProximidad()
   resrClient.post("/api/gps", post_body.c_str(), &response);
   delay(test_delay);
 }
-
 void POST_GPS1_TestDistancia()
 {
   String post_body = serializeBody(1,
@@ -321,8 +330,6 @@ void POST_GPS2_TestDistancia()
   resrClient.post("/api/gps", post_body.c_str(), &response);
   delay(test_delay);
 }
-
-
 void POST_GPS_TestAltura()
 {
   alt_prueba = alt_prueba - 10; 
@@ -356,7 +363,6 @@ void POST_GPS_TestAltura()
 
 
 }
-
 void check_alt_gps(){
 
   if(gps.altitude.meters()<=500){
@@ -377,7 +383,9 @@ void check_alt_gps(){
 }
 
 
-
+//////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////// LOOP /////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
 // Run the tests!
 void loop()
 {
@@ -386,13 +394,13 @@ void loop()
   }
   client.loop();
 
+  //POST_GPS();       //Descomenta para ejecutar el GPS
 
-  POST_GPS1_TestProximidad();
-  //POST_GPS2_TestProximidad();
+/////////////////////////////// PRUEBAS DE PROXIMIDAD /////////////////////////////// 
+  //POST_GPS1_TestProximidad();
+  POST_GPS2_TestProximidad();
   
-  //POST_GPS1_TestDistancia();
-  //POST_GPS2_TestDistancia();
-  
+/////////////////////////////// PRUEBAS DE ALTURA /////////////////////////////// 
   //POST_GPS_TestAltura();
   //check_alt_gps();
 }
