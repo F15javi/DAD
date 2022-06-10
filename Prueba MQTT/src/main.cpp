@@ -16,7 +16,7 @@ SoftwareSerial ss(RXPin, TXPin);
 
 
 
-int test_delay = 1000; //so we don't spam the API
+int test_delay = 0; //so we don't spam the API
 boolean describe_tests = true;
 
 RestClient resrClient = RestClient("192.168.43.253", 8080);//IP del servidor
@@ -24,7 +24,7 @@ RestClient resrClient = RestClient("192.168.43.253", 8080);//IP del servidor
 #define STASSID "le wifi"//Usuario
 #define STAPSK  "Javier15"//Contraseña
 const char* mqtt_server = "192.168.43.253";
-double lat_prueba1 = 39.95;
+double lat_prueba1 = 40;
 double lat_prueba2 = 39.9;
 double alt_prueba = 700;
 
@@ -64,9 +64,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
 void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
-    if (client.connect("ESP8266Client")) {
+    if (client.connect("Avion_1")) { //Id de la placa
       Serial.println("connected");
-      client.subscribe("topic_1");
+      client.subscribe("topic_1");  //Topic al que se suscribe
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -374,7 +374,7 @@ void loop()
 
 
   POST_GPS1_TestProximidad();
-  POST_GPS2_TestProximidad();
+  //POST_GPS2_TestProximidad();
   
   //POST_GPS1_TestDistancia();
   //POST_GPS2_TestDistancia();
