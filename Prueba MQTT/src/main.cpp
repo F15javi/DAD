@@ -7,7 +7,7 @@
 #include <SoftwareSerial.h>
 
 
-//               D3            D4 Declaracion de los pines de para el gps
+//               D3            D4           Declaracion de los pines de para el gps
 static const int RXPin = 0, TXPin = 2;
 // Objeto gps
 TinyGPSPlus gps;
@@ -24,7 +24,7 @@ RestClient resrClient = RestClient("192.168.43.253", 8080);//IP del servidor
 #define STASSID "le wifi"//Usuario
 #define STAPSK  "Javier15"//Contraseña
 const char* mqtt_server = "192.168.43.253";
-double lat_prueba1 = 40;
+double lat_prueba1 = 39.95;
 double lat_prueba2 = 39.9;
 double alt_prueba = 700;
 
@@ -49,9 +49,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
     lastMsg = now;
     Serial.print("10 segundos");
     if ((char)payload[0] == '1') {
-      digitalWrite(BUILTIN_LED, LOW);
+      digitalWrite(5, LOW);   //Si queremos que se encienda el BUILTIN_LED cambiamos el 5 por BUILTIN_LED
     } else {
-      digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off by making the voltage HIGH
+      digitalWrite(5, HIGH);  // Turn the LED off by making the voltage HIGH  //Lo mismo qeu arriba
     }
     
   }
@@ -64,9 +64,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
 void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
-    if (client.connect("Avion_1")) { //Id de la placa
+    if (client.connect("Avion_2")) {
       Serial.println("connected");
-      client.subscribe("topic_1");  //Topic al que se suscribe
+      client.subscribe("topic_2");    //Cambiar dependiendo de la placa
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -82,9 +82,11 @@ void reconnect() {
 void setup()
 {
   
-  pinMode(BUILTIN_LED, OUTPUT);
-  pinMode(4, OUTPUT);
-  digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off by making the voltage HIGH
+  //pinMode(BUILTIN_LED, OUTPUT);     Descomenta esto para que el led de la condición de cercanía se encienda por el BUILTIN_LED
+  pinMode(5, OUTPUT);     // D1 condicion de cercania
+  pinMode(4, OUTPUT);     // D2 condicion de altura
+  //digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off by making the voltage HIGH
+  digitalWrite(5, HIGH);  // Turn the LED off by making the voltage HIGH
 
   Serial.begin(9600);
   Serial.println();
@@ -258,9 +260,9 @@ void POST_GPS1_TestProximidad()
 }
 void POST_GPS2_TestProximidad()
 {
-  //lat_prueba2 = lat_prueba2 + 0.001; 
+  lat_prueba2 = lat_prueba2 + 0.001; 
   String post_body = serializeBody(2,
-                                  39.9, 
+                                  lat_prueba2, 
                                   89, 
                                   0,
                                   1000.0,
@@ -373,8 +375,8 @@ void loop()
   client.loop();
 
 
-  POST_GPS1_TestProximidad();
-  //POST_GPS2_TestProximidad();
+  //POST_GPS1_TestProximidad();
+  POST_GPS2_TestProximidad();
   
   //POST_GPS1_TestDistancia();
   //POST_GPS2_TestDistancia();
