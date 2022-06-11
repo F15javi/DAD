@@ -68,41 +68,43 @@ public class ApiRest extends AbstractVerticle {
 		// Rutas de acceso para Fly ↓
 		router.get("/api/fly").handler(this::getAllWithConnectionFly);
 		router.get("/api/fly/:id").handler(this::getById_Fly);
+		router.put("/api/fly/:id").handler(this::putFly);
 
 		// Rutas de acceso para Airport ↓
 		router.get("/api/airport").handler(this::getAllWithConnectionAirport);
 		router.get("/api/airport/:id").handler(this::getById_Airport);
+		router.put("/api/airport/:id").handler(this::putAirport);
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 
 		// Esto funciona ↓
 
-		mqttClient = MqttClient.create(vertx, new MqttClientOptions().setAutoKeepAlive(true));
-		mqttClient.connect(1883, "192.168.43.253", s -> { // cambiar ip a la del ordenador que haga de servidor
-
-			mqttClient.subscribe("Sus", MqttQoS.AT_LEAST_ONCE.value(), handler -> {
-				if (handler.succeeded()) {
-					System.out.println("SuscripciÃ³n " + mqttClient.clientId());
-				}
-			});
-
-			mqttClient.publishHandler(handler -> {
-				System.out.println("Mensaje recibido:");
-				System.out.println("    Topic: " + handler.topicName().toString());
-				System.out.println("    Id del mensaje: " + handler.messageId());
-				System.out.println("    Contenido: " + handler.payload().toString());
-				try {
-					Gps g = gson.fromJson(handler.payload().toString(), Gps.class);
-					System.out.println("    Gps: " + g.toString());
-				} catch (JsonSyntaxException e) {
-					System.out.println("    No es un Gps. ");
-				}
-			});
-			mqttClient.publish("topic_1", Buffer.buffer("Ejemplo"), MqttQoS.AT_LEAST_ONCE, false, false);
-
-		});
-
+//		mqttClient = MqttClient.create(vertx, new MqttClientOptions().setAutoKeepAlive(true));
+//		mqttClient.connect(1883, "192.168.43.253", s -> { // cambiar ip a la del ordenador que haga de servidor
+//
+//			mqttClient.subscribe("Sus", MqttQoS.AT_LEAST_ONCE.value(), handler -> {
+//				if (handler.succeeded()) {
+//					System.out.println("SuscripciÃ³n " + mqttClient.clientId());
+//				}
+//			});
+//
+//			mqttClient.publishHandler(handler -> {
+//				System.out.println("Mensaje recibido:");
+//				System.out.println("    Topic: " + handler.topicName().toString());
+//				System.out.println("    Id del mensaje: " + handler.messageId());
+//				System.out.println("    Contenido: " + handler.payload().toString());
+//				try {
+//					Gps g = gson.fromJson(handler.payload().toString(), Gps.class);
+//					System.out.println("    Gps: " + g.toString());
+//				} catch (JsonSyntaxException e) {
+//					System.out.println("    No es un Gps. ");
+//				}
+//			});
+//			mqttClient.publish("topic_1", Buffer.buffer("Ejemplo"), MqttQoS.AT_LEAST_ONCE, false, false);
+//
+//		});
+//
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -288,7 +290,28 @@ public class ApiRest extends AbstractVerticle {
 		});
 	}
 	
-	// Peticiones Airport
+	private void putFly(RoutingContext routingContext) { //Actualiza un Aeropuerto
+		Integer id_Fly = Integer.parseInt(routingContext.request().getParam("id"));
+		Fly fly = Json.decodeValue(routingContext.getBodyAsString(), Fly.class);
+		mySqlClient.getConnection(connection -> {
+			if (connection.succeeded()) {
+				connection.result().preparedQuery("UPDATE user SET name = ?, lat = ?, lon = ? WHERE id_Airport = "+id_Fly+";")
+						.execute(Tuple.of(fly.getId_AirportDest(), fly.getId_AirportOrig(), fly.getPlate(), fly.getTime_Dep(), fly.getTime_Arr(),
+								routingContext.request().getParam("id_Fly")),
+						handler -> {
+							if (handler.succeeded()) {
+								routingContext.response().setStatusCode(200)
+								.putHeader("content-type", "application/json").end(gson.toJson(fly));
+							} else {
+								routingContext.response().setStatusCode(401).putHeader("content-type", "application/json").end();
+								connection.result().close();
+							}
+						});
+			}
+		});
+	}
+	// Peticiones Airport ↓
+	
 	private void getAllWithConnectionAirport(RoutingContext routingContext) {
 		mySqlClient.getConnection(connection -> {
 			if (connection.succeeded()) {
@@ -340,4 +363,46 @@ public class ApiRest extends AbstractVerticle {
 			}
 		});
 	}
+	
+	
+	private void putAirport(RoutingContext routingContext) { //Actualiza un Aeropuerto
+		Integer id_Airport = Integer.parseInt(routingContext.request().getParam("id"));
+		Airport airport = Json.decodeValue(routingContext.getBodyAsString(), Airport.class);
+		mySqlClient.getConnection(connection -> {
+			if (connection.succeeded()) {
+				connection.result().preparedQuery("UPDATE user SET name = ?, lat = ?, lon = ? WHERE id_Airport = "+id_Airport+";")
+						.execute(Tuple.of(airport.getName(), airport.getLat(), airport.getLon(),
+								routingContext.request().getParam("id_Airport")),
+						handler -> {
+							if (handler.succeeded()) {
+								routingContext.response().setStatusCode(200)
+								.putHeader("content-type", "application/json").end(gson.toJson(airport));
+							} else {
+								routingContext.response().setStatusCode(401).putHeader("content-type", "application/json").end();
+								connection.result().close();
+							}
+						});
+			}
+		});
+	}
+	
+//	private void putAirport(RoutingContext routingContext) { //Actualiza un Aeropuerto
+//		Integer id_Airport = Integer.parseInt(routingContext.request().getParam("id"));
+//		Airport airport = Json.decodeValue(routingContext.getBodyAsString(), Airport.class);
+//		mySqlClient.preparedQuery(
+//				"UPDATE user SET name = ?, lat = ?, lon = ? WHERE id_Airport = "+id_Airport+";",
+//				Tuple.of(airport.getName(), airport.getLat(), airport.getLon(),
+//						routingContext.request().getParam("id_Airport")),
+//				handler -> {
+//					if (handler.succeeded()) {
+//						routingContext.response().setStatusCode(200)
+//						.putHeader("content-type", "application/json").end(gson.toJson(airport));
+//					} else {
+//						routingContext.response().setStatusCode(401).putHeader("content-type", "application/json")
+//								.end((JsonObject.mapFrom(handler.cause()).encodePrettily()));
+//					}
+//				});
+//	}
+	
 }
+
