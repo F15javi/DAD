@@ -76,7 +76,7 @@ public class ApiRest extends AbstractVerticle {
 		mqttClient = MqttClient.create(vertx, new MqttClientOptions().setAutoKeepAlive(true));
 		mqttClient.connect(1883, "192.168.43.253", s -> { // cambiar ip a la del ordenador que haga de servidor
 
-			mqttClient.subscribe("topic_2", MqttQoS.AT_LEAST_ONCE.value(), handler -> {
+			mqttClient.subscribe("Sus", MqttQoS.AT_LEAST_ONCE.value(), handler -> {
 				if (handler.succeeded()) {
 					System.out.println("SuscripciÃ³n " + mqttClient.clientId());
 				}
@@ -98,11 +98,10 @@ public class ApiRest extends AbstractVerticle {
 
 		});
 
-		// getAll();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
-	private void getAll() {
+	private void getAll(RoutingContext routingContext) {
 		mySqlClient.query("SELECT * FROM dad_db_avion.gps;").execute(res -> {
 			if (res.succeeded()) {
 				// Get the result set
@@ -177,13 +176,13 @@ public class ApiRest extends AbstractVerticle {
 
 	private void postGps(RoutingContext routingContext) {
 		final Gps gps = gson.fromJson(routingContext.getBodyAsString(), Gps.class);
-		// gps.setTime(System.currentTimeMillis());
+		//gps.setTime(System.currentTimeMillis());
 		mySqlClient.getConnection(connection -> {
 			if (connection.succeeded()) {
 				connection.result().preparedQuery(
 						"INSERT INTO dad_db_avion.gps (id_Fly, lat, lon, dir, vel, alt, time) VALUES (?,?,?,?,?,?,?)")
 						.execute(Tuple.of(gps.getId_Fly(), gps.getLat(), gps.getLon(), gps.getDir(), gps.getVel(),
-								gps.getAlt(), gps.getTime()), handler -> {
+								gps.getAlt(), System.currentTimeMillis()), handler -> {
 									if (handler.succeeded()) {
 										routingContext.response().setStatusCode(200)
 												.putHeader("content-type", "application/json").end(gson.toJson(gps));
@@ -194,8 +193,22 @@ public class ApiRest extends AbstractVerticle {
 												.execute(Tuple.of(gps.getLon(), gps.getLat(), gps.getId_Fly()), res -> {
 													if (res.result().size() > 0) {
 														
+														
+														RowSet<Row> resultSet = res.result();
+														System.out.println(resultSet.size());
+														List<Gps> result = new ArrayList<>();
+														for (Row elem : resultSet) {
+															result.add(new Gps(elem.getInteger("id_Gps"), elem.getInteger("id_Fly"),
+																	elem.getDouble("lat"), elem.getDouble("lon"), elem.getInteger("dir"),
+																	elem.getDouble("vel"), elem.getDouble("alt"), elem.getLong("time")));
+														}
+														//System.out.println(gson.toJson(result));
+														
 														System.out.println(res.result().size());
-														mqttClient.publish("topic_1", Buffer.buffer("1"), MqttQoS.AT_LEAST_ONCE, false, false);
+														mqttClient.publish("topic_"+gps.getId_Fly(), Buffer.buffer("1"), MqttQoS.AT_LEAST_ONCE, false, false);
+
+													}else {
+														mqttClient.publish("topic_"+gps.getId_Fly(), Buffer.buffer("0"), MqttQoS.AT_LEAST_ONCE, false, false);
 
 													}
 													connection.result().close();
