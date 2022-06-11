@@ -66,8 +66,13 @@ public class ApiRest extends AbstractVerticle {
 		router.post("/api/gps").handler(this::postGps);
 		
 		// Rutas de acceso para Fly ↓
-		router.get("/api/fly").handler(this::getFly);
-		
+		router.get("/api/fly").handler(this::getAllWithConnectionFly);
+		router.get("/api/fly/:id").handler(this::getById_Fly);
+
+		// Rutas de acceso para Airport ↓
+		router.get("/api/airport").handler(this::getAllWithConnectionAirport);
+		router.get("/api/airport/:id").handler(this::getById_Airport);
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 
@@ -125,7 +130,7 @@ public class ApiRest extends AbstractVerticle {
 	private void getAllWithConnectionGPS(RoutingContext routingContext) {
 		mySqlClient.getConnection(connection -> {
 			if (connection.succeeded()) {
-				connection.result().query("SELECT * FROM dad_db_avion.gps;").execute(res -> {
+				connection.result().query("SELECT * FROM dad_db_avion.gps LIMIT 5;").execute(res -> {
 					if (res.succeeded()) {
 						// Get the result set
 						RowSet<Row> resultSet = res.result();
@@ -149,9 +154,12 @@ public class ApiRest extends AbstractVerticle {
 	}
 
 	private void getById_Gps(RoutingContext routingContext) {
+		
+		Integer id_Gps = Integer.parseInt(routingContext.request().getParam("id"));
+		
 		mySqlClient.getConnection(connection -> {
 			if (connection.succeeded()) {
-				connection.result().query("SELECT * FROM dad_db_avion.gps where id_Gps = ?;").execute(res -> {
+				connection.result().query("SELECT * FROM dad_db_avion.gps where id_Gps = "+id_Gps+";").execute(res -> {
 					if (res.succeeded()) {
 						// Get the result set
 						RowSet<Row> resultSet = res.result();
@@ -228,54 +236,108 @@ public class ApiRest extends AbstractVerticle {
 	
 	// Peticiones Fly ↓
 	
-	private void getFly(RoutingContext routingContext) {
-		mySqlClient.preparedQuery("SELECT * FROM dad_db_avion.fly;").execute( res -> {
+	private void getAllWithConnectionFly(RoutingContext routingContext) {
+		mySqlClient.getConnection(connection -> {
+			if (connection.succeeded()) {
+				connection.result().query("SELECT * FROM dad_db_avion.fly LIMIT 5;").execute(res -> {
 					if (res.succeeded()) {
 						// Get the result set
 						RowSet<Row> resultSet = res.result();
 						System.out.println(resultSet.size());
 						List<Fly> result = new ArrayList<>();
 						for (Row elem : resultSet) {
-							result.add(new Fly(elem.getInteger("id_Fly"), elem.getInteger("id_AirporDest"), 
-											elem.getInteger("id_AirporOrig"), elem.getString("plate"),  elem.getLong("time_Dep"), elem.getLong("time_Arr")));
+							result.add(new Fly(elem.getInteger("id_Fly"), elem.getInteger("id_AirportDest"), 
+									elem.getInteger("id_AirportOrig"), elem.getString("plate"),  elem.getLong("time_Dep"), elem.getLong("time_Arr")));
 						}
-						routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
-						.end(gson.toJson(result));
+						System.out.println(result.toString());
 					} else {
-						routingContext.response().setStatusCode(400).putHeader("content-type", "application/json")
-						.end();
+						System.out.println("Error: " + res.cause().getLocalizedMessage());
 					}
-					
+					connection.result().close();
+				});
+			} else {
+				System.out.println(connection.cause().toString());
+			}
 		});
-
 	}
 	
+	private void getById_Fly(RoutingContext routingContext) {
+		Integer id_Fly = Integer.parseInt(routingContext.request().getParam("id"));
+		
+		mySqlClient.getConnection(connection -> {
+			if (connection.succeeded()) {
+				connection.result().query("SELECT * FROM dad_db_avion.fly where id_Fly = "+id_Fly+";").execute(res -> {
+					if (res.succeeded()) {
+						// Get the result set
+						RowSet<Row> resultSet = res.result();
+						System.out.println(resultSet.size());
+						List<Fly> result = new ArrayList<>();
+						for (Row elem : resultSet) {
+							result.add(new Fly(elem.getInteger("id_Fly"), elem.getInteger("id_AirportDest"), 
+									elem.getInteger("id_AirportOrig"), elem.getString("plate"),  elem.getLong("time_Dep"), elem.getLong("time_Arr")));
+						}
+						System.out.println(result.toString());
+					} else {
+						System.out.println("Error: " + res.cause().getLocalizedMessage());
+					}
+					connection.result().close();
+				});
+			} else {
+				System.out.println(connection.cause().toString());
+			}
+		});
+	}
 	
-	
-//	private void getTermometro(RoutingContext routingContext) {
-//
-//		mySqlClient.preparedQuery("SELECT * FROM dad_database.termometro ORDER BY termometrocol DESC LIMIT 1")
-//				.execute(res -> {
-//					if (res.succeeded()) {
-//						// Get the result set
-//						RowSet<Row> resultSet = res.result();
-//						System.out.println(resultSet.size());
-//						List<Termometro> result = new ArrayList<>();
-//						for (Row elem : resultSet) {
-//							result.add(new Termometro(elem.getInteger("termometroId"), elem.getInteger("pistaId"),
-//									elem.getDouble("temperatura"), elem.getDouble("humedad"),
-//									elem.getLong("timestamp")));
-//						}
-//						routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
-//						.end(gson.toJson(result));
-//					} else {
-//						routingContext.response().setStatusCode(400).putHeader("content-type", "application/json")
-//								.end();
-	
-	
-	
-	// Peticiones del Airport ↓
-
-
-	
+	// Peticiones Airport
+	private void getAllWithConnectionAirport(RoutingContext routingContext) {
+		mySqlClient.getConnection(connection -> {
+			if (connection.succeeded()) {
+				connection.result().query("SELECT * FROM dad_db_avion.airport LIMIT 5;").execute(res -> {
+					if (res.succeeded()) {
+						// Get the result set
+						RowSet<Row> resultSet = res.result();
+						System.out.println(resultSet.size());
+						List<Airport> result = new ArrayList<>();
+						for (Row elem : resultSet) {
+							result.add(new Airport(elem.getInteger("id_Airport"), elem.getString("name"), 
+											 elem.getDouble("lat"), elem.getDouble("lon")));
+						}
+						System.out.println(result.toString());
+						System.out.println(gson.toJson(result));
+					} else {
+						System.out.println("Error: " + res.cause().getLocalizedMessage());
+					}
+					connection.result().close();
+				});
+			} else {
+				System.out.println(connection.cause().toString());
+			}
+		});
+	}
+	private void getById_Airport(RoutingContext routingContext) {
+		Integer id_Airport = Integer.parseInt(routingContext.request().getParam("id"));
+		
+		mySqlClient.getConnection(connection -> {
+			if (connection.succeeded()) {
+				connection.result().query("SELECT * FROM dad_db_avion.airport where id_Airport = "+id_Airport+";").execute(res -> {
+					if (res.succeeded()) {
+						// Get the result set
+						RowSet<Row> resultSet = res.result();
+						System.out.println(resultSet.size());
+						List<Airport> result = new ArrayList<>();
+						for (Row elem : resultSet) {
+							result.add(new Airport(elem.getInteger("id_Airport"), elem.getString("name"), 
+											 elem.getDouble("lat"), elem.getDouble("lon")));
+						}
+						System.out.println(result.toString());
+					} else {
+						System.out.println("Error: " + res.cause().getLocalizedMessage());
+					}
+					connection.result().close();
+				});
+			} else {
+				System.out.println(connection.cause().toString());
+			}
+		});
+	}
 }
