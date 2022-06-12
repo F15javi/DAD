@@ -361,17 +361,17 @@ public class ApiRest extends AbstractVerticle {
 	
 	private void putAirport(RoutingContext routingContext) {
 
-		final Airport airportMod = gson.fromJson(routingContext.getBodyAsString(), Airport.class);
+		final Airport airport = gson.fromJson(routingContext.getBodyAsString(), Airport.class);
 		
-		System.out.println(airportMod);
+		System.out.println(airport);
 		mySqlClient.getConnection(connection -> {
 			if (connection.succeeded()) {
 				connection.result().preparedQuery("UPDATE dad_db_avion.airport SET name = ?, lat = ?, lon = ? WHERE id_Airport = ?;")
-						.execute(Tuple.of(airportMod.getName(),airportMod.getLat(), airportMod.getLon(),airportMod.getId_Airport()),
+						.execute(Tuple.of(airport.getName(),airport.getLat(), airport.getLon(),airport.getId_Airport()),
 						handler -> {
 							if (handler.succeeded()) {
 								routingContext.response().setStatusCode(200)
-								.putHeader("content-type", "application/json").end(gson.toJson(airportMod));
+								.putHeader("content-type", "application/json").end(gson.toJson(airport));
 							} else {
 								routingContext.response().setStatusCode(401).putHeader("content-type", "application/json").end();
 								connection.result().close();

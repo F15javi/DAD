@@ -27,7 +27,7 @@ int test_delay = 0; //so we don't spam the API
 boolean describe_tests = true;
 
 /////////////////////////////// CONEXIÓN WIFI ////////////////////////////////////
-RestClient resrClient = RestClient("192.168.43.253", 8080);//IP del servidor
+RestClient restClient = RestClient("192.168.43.253", 8080);//IP del servidor
 
 #define STASSID "le wifi"//Usuario
 #define STAPSK  "Javier15"//Contraseña
@@ -261,17 +261,17 @@ void describe(char *description)
 void POST_GPS()
 {
   String post_body = serializeBody(1,
-                                  gps.altitude.meters(), 
                                   gps.location.lat(), 
                                   gps.location.lng(),
                                   gps.course.deg(),
                                   gps.speed.kmph(),
+                                  gps.altitude.meters(), 
                                   millis()
                                   ); 
   //describe("Test POST with path and body and response");
-  //test_status(resrClient.post("/api/gps", post_body.c_str(), &response));
+  //test_status(restClient.post("/api/gps", post_body.c_str(), &response));
   //test_response();
-  resrClient.post("/api/gps", post_body.c_str(), &response);
+  restClient.post("/api/gps", post_body.c_str(), &response);
   delay(test_delay);
 
 }
@@ -288,9 +288,9 @@ void POST_GPS1_TestProximidad()
                                   millis()//random esta loco
                                   ); 
   //describe("Test POST with path and body and response");
-  //test_status(resrClient.post("/api/gps", post_body.c_str(), &response));
+  //test_status(restClient.post("/api/gps", post_body.c_str(), &response));
   //test_response();
-  resrClient.post("/api/gps", post_body.c_str(), &response);
+  restClient.post("/api/gps", post_body.c_str(), &response);
   delay(test_delay);
 
 }
@@ -307,9 +307,9 @@ void POST_GPS2_TestProximidad()
                                   millis()//random esta loco
                                   ); 
   //describe("Test POST with path and body and response");
-  //test_status(resrClient.post("/api/gps", post_body.c_str(), &response));
+  //test_status(restClient.post("/api/gps", post_body.c_str(), &response));
   //test_response();
-  resrClient.post("/api/gps", post_body.c_str(), &response);
+  restClient.post("/api/gps", post_body.c_str(), &response);
   delay(test_delay);
 }
 void POST_GPS1_TestDistancia()
@@ -323,9 +323,9 @@ void POST_GPS1_TestDistancia()
                                   millis()//random esta loco
                                   ); 
   //describe("Test POST with path and body and response");
-  //test_status(resrClient.post("/api/gps", post_body.c_str(), &response));
+  //test_status(restClient.post("/api/gps", post_body.c_str(), &response));
   //test_response();
-  resrClient.post("/api/gps", post_body.c_str(), &response);
+  restClient.post("/api/gps", post_body.c_str(), &response);
   delay(test_delay);
 
 }
@@ -340,9 +340,9 @@ void POST_GPS2_TestDistancia()
                                   millis()//random esta loco
                                   ); 
   //describe("Test POST with path and body and response");
-  //test_status(resrClient.post("/api/gps", post_body.c_str(), &response));
+  //test_status(restClient.post("/api/gps", post_body.c_str(), &response));
   //test_response();
-  resrClient.post("/api/gps", post_body.c_str(), &response);
+  restClient.post("/api/gps", post_body.c_str(), &response);
   delay(test_delay);
 }
 void POST_GPS_TestAltura()
@@ -357,9 +357,9 @@ void POST_GPS_TestAltura()
                                   millis()//random esta loco
                                   ); 
   //describe("Test POST with path and body and response");
-  //test_status(resrClient.post("/api/gps", post_body.c_str(), &response));
+  //test_status(restClient.post("/api/gps", post_body.c_str(), &response));
   //test_response();
-  resrClient.post("/api/gps", post_body.c_str(), &response);
+  restClient.post("/api/gps", post_body.c_str(), &response);
   delay(test_delay);
 
   if(alt_prueba <= 500){
@@ -408,6 +408,7 @@ void loop()
     reconnect();
   }
   client.loop();
+ 
 
   //POST_GPS();       //Descomenta para ejecutar el GPS
 
