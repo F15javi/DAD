@@ -104,6 +104,10 @@ void setup()
   //digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off by making the voltage HIGH
   digitalWrite(5, LOW);  // Turn the LED off by making the voltage HIGH
 
+
+  //Serial.begin(19200);
+  //ss.begin(9600); Codigo para usar el gps
+
   Serial.begin(9600);
   Serial.println();
   Serial.print("Connecting to ");
@@ -271,8 +275,13 @@ void POST_GPS()
   //describe("Test POST with path and body and response");
   //test_status(restClient.post("/api/gps", post_body.c_str(), &response));
   //test_response();
-  restClient.post("/api/gps", post_body.c_str(), &response);
-  delay(test_delay);
+  if(ss.available() > 0){
+    restClient.post("/api/gps", post_body.c_str(), &response);
+    delay(test_delay);
+  }else{
+    Serial.print("Fallo del gps");
+  }
+  
 
 }
 void POST_GPS1_TestProximidad()
