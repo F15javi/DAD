@@ -316,7 +316,8 @@ public class ApiRest extends AbstractVerticle {
 							result.add(new Airport(elem.getInteger("id_Airport"), elem.getString("name"), 
 											 elem.getDouble("lat"), elem.getDouble("lon")));
 						}
-						System.out.println(result.toString());
+						routingContext.response().setStatusCode(200)
+						.putHeader("content-type", "application/json").end(gson.toJson(result));
 						System.out.println(gson.toJson(result));
 					} else {
 						System.out.println("Error: " + res.cause().getLocalizedMessage());
