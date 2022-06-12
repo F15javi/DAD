@@ -279,6 +279,8 @@ public class ApiRest extends AbstractVerticle {
 									elem.getInteger("id_AirportOrig"), elem.getString("plate"),  elem.getLong("time_Dep"), elem.getLong("time_Arr")));
 						}
 						System.out.println(result.toString());
+						routingContext.response().setStatusCode(200)
+						.putHeader("content-type", "application/json").end(gson.toJson(result));
 					} else {
 						System.out.println("Error: " + res.cause().getLocalizedMessage());
 					}
@@ -355,6 +357,8 @@ public class ApiRest extends AbstractVerticle {
 											 elem.getDouble("lat"), elem.getDouble("lon")));
 						}
 						System.out.println(result.toString());
+						routingContext.response().setStatusCode(200)
+						.putHeader("content-type", "application/json").end(gson.toJson(result));
 					} else {
 						System.out.println("Error: " + res.cause().getLocalizedMessage());
 					}
